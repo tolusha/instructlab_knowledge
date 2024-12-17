@@ -1,0 +1,3 @@
+title_of_work: Devfile introduction
+link_to_work: https://devfile.io/
+license_of_the_work: CC-BY-SA-4.0
