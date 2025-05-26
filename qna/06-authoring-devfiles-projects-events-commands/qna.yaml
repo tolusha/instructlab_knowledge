@@ -149,7 +149,8 @@ seed_examples:
         answer: No, the `subDir` field is only applicable to git-based starter projects, not zip-based ones.
       - question: What schema version introduced starter projects and what version is used in the examples?
         answer: Starter projects are supported in schema version `2.2.0`, which is the version used in the provided examples.
-  - context: Devfiles support defining structured commands to automate development workflows, using three main types: exec, apply, and composite. Exec commands are used to run specific actions within a container, such as compiling code or starting a development server. Apply commands trigger configuration or deployment actions, like applying Kubernetes manifests. Composite commands allow multiple commands to be executed sequentially or in parallel, enabling complex workflows. Each command can be grouped by function—such as build, run, test, debug, or deploy—to clarify its role and enable tool integration. This structured approach streamlines development processes within devfile-based environments.
+  - context: >
+      Devfiles support defining structured commands to automate development workflows, using three main types: exec, apply, and composite. Exec commands are used to run specific actions within a container, such as compiling code or starting a development server. Apply commands trigger configuration or deployment actions, like applying Kubernetes manifests. Composite commands allow multiple commands to be executed sequentially or in parallel, enabling complex workflows. Each command can be grouped by function—such as build, run, test, debug, or deploy—to clarify its role and enable tool integration. This structured approach streamlines development processes within devfile-based environments.
     questions_and_answers:
       - question: How do you define a basic command in a devfile?
         answer: >
@@ -227,7 +228,8 @@ seed_examples:
       - question: How many types of command kinds are available and what are they?
         answer: >
           There are three kinds of commands in a devfile: `exec`, `apply`, and `composite`. Each serves a distinct purpose: executing shell commands, applying resources, or chaining other commands.
-      - question: What does setting `isDefault: true` do for a command?
+      - question: >
+          What does setting `isDefault: true` do for a command?
         answer: >
           Setting `isDefault: true` marks the command as the default for its group kind. Only one command can be the default per group. Example:
           ```yaml
@@ -276,7 +278,8 @@ seed_examples:
         answer: Setting multiple default commands for the same group kind is not allowed and can lead to undefined behavior or devfile validation errors. Only one default command should exist per group.
       - question: Can `exec` commands be chained without using a composite command?
         answer: No, individual `exec` commands cannot be chained directly. To run multiple commands in a sequence or in parallel, you must define a `composite` command referencing their IDs.
-  - context: Devfiles in version 2.x support event bindings that enable command execution at specific stages of the container lifecycle. There are three event types: preStart, postStart, and preStop. The preStart event runs commands as Kubernetes init containers before the main containers start. PostStart commands are triggered once the pod is running, and preStop commands execute just before the pod is terminated. These events can reference exec, apply, or composite commands to automate setup, initialization, or cleanup tasks. The syntax allows for flexible orchestration, and example snippets illustrate how to integrate these events into a devfile for streamlined environment management.
+  - context: >
+      Devfiles in version 2.x support event bindings that enable command execution at specific stages of the container lifecycle. There are three event types: preStart, postStart, and preStop. The preStart event runs commands as Kubernetes init containers before the main containers start. PostStart commands are triggered once the pod is running, and preStop commands execute just before the pod is terminated. These events can reference exec, apply, or composite commands to automate setup, initialization, or cleanup tasks. The syntax allows for flexible orchestration, and example snippets illustrate how to integrate these events into a devfile for streamlined environment management.
     questions_and_answers:
       - question: What are the different types of event objects supported in a devfile?
         answer: >

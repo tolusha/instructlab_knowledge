@@ -58,9 +58,9 @@ seed_examples:
       - question: What is the role of devfiles in `Eclipse Che`?
         answer: In `Eclipse Che`, devfiles are used to create customizable workspaces with community-backed samples, allowing developers to start coding in their preferred language with preconfigured tools.
       - question: How does `Amazon CodeCatalyst` utilize devfiles?
-        answer: `Amazon CodeCatalyst` uses devfiles in its blueprints to define and pre-install required tools and libraries in a development environment for applications like a modern three-tier web app.
+        answer: In `Amazon CodeCatalyst`, devfiles are used in its blueprints to define and pre-install required tools and libraries in a development environment for applications like a modern three-tier web app.
       - question: How does `JetBrains Space` use devfiles for cloud development?
-        answer: `JetBrains Space` uses devfiles to configure remote development environments that are linked to Git repositories, enabling consistent and ready-to-use dev setups in the cloud.
+        answer: In `JetBrains Space`, devfiles are used to configure remote development environments that are linked to Git repositories, enabling consistent and ready-to-use dev setups in the cloud.
       - question: What are some benefits of using devfiles in remote or cloud environments?
         answer: Devfiles offer pre-configured, consistent, and reproducible environments that reduce setup time and complexity, making them ideal for remote and cloud-based development.
       - question: How do devfiles help standardize development setups across different IDEs and platforms?
@@ -74,7 +74,8 @@ seed_examples:
       - question: Where does the YAML Language Server obtain the devfile schema?
         answer: It obtains the devfile schema from the JSON Schema Store, where the devfile team maintains the schema.
       - question: What settings need to be added to VSCode for devfile IntelliSense?
-        answer: Users need to add a reference to the devfile schema in their VSCode settings using this snippet:
+        answer: >
+          Users need to add a reference to the devfile schema in their VSCode settings using this snippet:
           ```json
           "yaml.schemas": {
             "https://raw.githubusercontent.com/devfile/api/main/schemas/latest/devfile.json": "devfile.yaml"
@@ -82,7 +83,6 @@ seed_examples:
           ```
       - question: Are there plugins for editors other than VSCode to support devfile integration?
         answer: Yes, other editor plugins that support the YAML Language Server can be found in its GitHub repository.
-seed_examples:
   - context: Devfile validation rules are designed to ensure that configurations are well-structured and align with Kubernetes standards. These rules enforce naming conventions for fields like id and name, which must use lowercase alphanumeric characters with optional dashes and be no longer than 63 characters. At the component level, names must be unique, and containers must be properly configured with valid volume mounts and environment variables. Commands require unique IDs and must follow type-specific rules for exec, apply, and composite commands. Endpoint ports need to be uniquely defined across container components unless dedicated pods are used. Additional validation covers events, plugin components, image definitions, and project configurations to maintain overall schema consistency and integrity.
     questions_and_answers:
       - question: What is the regex pattern used to validate `id` and `name` fields in a Devfile?

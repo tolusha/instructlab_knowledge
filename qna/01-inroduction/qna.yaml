@@ -59,19 +59,19 @@ seed_examples:
         answer: The outer loop refers to activities like code reviews and integration tests, typically automated using CI/CD pipelines. These are supported by resources included in a devfile stack but are executed outside of the developer’s inner development workflow.
   - context: Devfile samples are curated, ready-to-use examples that demonstrate how to configure development environments for specific languages, frameworks, or application types using the Devfile specification. Each sample typically includes a devfile.yaml along with the relevant source code, showcasing best practices for defining components, commands, endpoints, and environment settings. These samples are designed to help developers quickly get started by providing a fully functional, minimal setup for common stacks such as Node.js, Java (Spring Boot or Quarkus), Python, Go, and .NET.
     questions_and_answers:
-    - question: What is the initial devfile?
-      answer: |
-        The initial devfile is the minimal configuration required to define a development environment. Here's the default initial devfile:
-        ```yaml
-        schemaVersion: 2.3.0
-        metadata:
-          name: devfile
-        components:
-          - name: tools
-            container:
-              image: quay.io/devfile/universal-developer-image:latest
-        ```
-        This devfile uses the universal developer image and provides a basic container environment suitable for most development use cases.    
+      - question: What is the initial devfile?
+        answer: |
+          The initial devfile is the minimal configuration required to define a development environment. Here's the default initial devfile:
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: devfile
+          components:
+            - name: tools
+              container:
+                image: quay.io/devfile/universal-developer-image:latest
+          ```
+          This devfile uses the universal developer image and provides a basic container environment suitable for most development use cases.
       - question: What is the a sample devfile for .NET 5.0
         answer: |
           ```yaml
@@ -133,7 +133,6 @@ seed_examples:
                   isDefault: true
                   kind: run
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for .NET 6.0
         answer: |
           ```yaml
@@ -195,7 +194,6 @@ seed_examples:
                   isDefault: true
                   kind: run
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for .NET 8.0
         answer: |
           ```yaml
@@ -257,7 +255,6 @@ seed_examples:
                   isDefault: true
                   kind: run
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for .NET Core 3.1
         answer: |
           ```yaml
@@ -319,7 +316,6 @@ seed_examples:
                   isDefault: true
                   kind: run
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Go Runtime
         answer: |
           ```yaml
@@ -403,7 +399,6 @@ seed_examples:
                 workingDir: ${PROJECT_SOURCE}
               id: debug
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Maven Java
         answer: |
           ```yaml
@@ -472,7 +467,6 @@ seed_examples:
                   kind: debug
                   isDefault: true
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Open Liberty Gradle
         answer: |
           ```yaml
@@ -492,7 +486,6 @@ seed_examples:
           # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
           # See the License for the specific language governing permissions and
           # limitations under the License.
-          
           schemaVersion: 2.2.2
           metadata:
             name: java-openliberty-gradle
@@ -577,7 +570,6 @@ seed_examples:
                   kind: test
                   isDefault: true
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Open Liberty Maven
         answer: |
           ```yaml
@@ -597,7 +589,6 @@ seed_examples:
           # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
           # See the License for the specific language governing permissions and
           # limitations under the License.
-          
           schemaVersion: 2.2.2
           metadata:
             name: java-openliberty
@@ -685,7 +676,6 @@ seed_examples:
                   kind: test
                   isDefault: true
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Quarkus Java
         answer: |
           ```yaml
@@ -760,7 +750,6 @@ seed_examples:
             postStart:
               - init-compile
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Spring Boot®
         answer: |
           ```yaml
@@ -831,7 +820,6 @@ seed_examples:
                   kind: debug
                   isDefault: true
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Vert.x Java
         answer: |
           ```yaml
@@ -975,7 +963,6 @@ seed_examples:
                   isDefault: true
                   kind: debug
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for WebSphere Liberty Gradle
         answer: |
           ```yaml
@@ -995,7 +982,6 @@ seed_examples:
           # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
           # See the License for the specific language governing permissions and
           # limitations under the License.
-          
           schemaVersion: 2.2.2
           metadata:
             name: java-websphereliberty-gradle
@@ -1081,7 +1067,6 @@ seed_examples:
                   kind: test
                   isDefault: true
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for WebSphere Liberty Maven
         answer: |
           ```yaml
@@ -1101,7 +1086,6 @@ seed_examples:
           # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
           # See the License for the specific language governing permissions and
           # limitations under the License.
-          
           schemaVersion: 2.2.2
           metadata:
             name: java-websphereliberty
@@ -1190,7 +1174,6 @@ seed_examples:
                   kind: test
                   isDefault: true
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for WildFly Bootable Jar
         answer: |
           ```yaml
@@ -1414,7 +1397,6 @@ seed_examples:
                   kind: debug
                   isDefault: true
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for WildFly Getting Started
         answer: |
           ```yaml
@@ -1507,7 +1489,6 @@ seed_examples:
                   kind: debug
                   isDefault: true
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for JHipster Online
         answer: |
           ```yaml
@@ -1515,14 +1496,14 @@ seed_examples:
           metadata:
             name: jhipster-online
             version: 2.33.1
-            description: "Stack with JHipster Online on Red Hat OpenShift Dev Spaces. 
+            description: "Stack with JHipster Online on Red Hat OpenShift Dev Spaces.
               This stack include:
               - JHipster 8.8.0. for generate Spring Boot 3.4.1 projects.
               - generator-jhipster-micronaut 3.6.0 for generate Micronaut 4.7.2 projects.
               - generator-jhipster-quarkus 3.4.0 for generate Quarkus 3.11.1 projects.
               - generator-jhipster-dotnetcore 4.2.0 for generate .Net 8.0 projects.
               Watch the demo video:
-              - https://youtu.be/b7xbcTAGNIQ?si=snE57Th4S3gPv_Vn"    
+              - https://youtu.be/b7xbcTAGNIQ?si=snE57Th4S3gPv_Vn"
             displayName: JHipster Online
             icon: https://raw.githubusercontent.com/redhat-developer-demos/jhipster-online/main/jhipster-icon.png
             website: https://start.jhipster.tech
@@ -1641,7 +1622,6 @@ seed_examples:
                   kind: run
                   isDefault: false
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Angular
         answer: |
           ```yaml
@@ -1697,7 +1677,6 @@ seed_examples:
                 hotReloadCapable: true
                 workingDir: ${PROJECT_SOURCE}
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Node.js MongoDB
         answer: |
           ```yaml
@@ -1729,7 +1708,7 @@ seed_examples:
                 env:
                 # The values below are used to set up the environment for running the application
                   - name: SECRET
-                    value: dummy-value 
+                    value: dummy-value
                   - name: NODE_ENV
                     value: production
                 endpoints:
@@ -1739,7 +1718,6 @@ seed_examples:
                     protocol: https
                 memoryLimit: 1G
                 mountSources: true
-          
             - name: mongo
               container:
                 # bitnami/mongodb:8.0.8
@@ -1764,11 +1742,9 @@ seed_examples:
                 volumeMounts:
                   - name: mongo-storage
                     path: /bitnami/mongodb
-          
             - name: mongo-storage
               volume:
                 size: 256Mi
-          
           commands:
             - id: run-application
               exec:
@@ -1779,7 +1755,6 @@ seed_examples:
                 group:
                   kind: run
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Next.js
         answer: |
           ```yaml
@@ -1834,7 +1809,6 @@ seed_examples:
                 workingDir: ${PROJECT_SOURCE}
               id: run
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Nuxt.js
         answer: |
           ```yaml
@@ -1888,7 +1862,6 @@ seed_examples:
                 workingDir: ${PROJECT_SOURCE}
               id: run
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for React
         answer: |
           ```yaml
@@ -1941,7 +1914,6 @@ seed_examples:
                 workingDir: ${PROJECT_SOURCE}
               id: run
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Svelte
         answer: |
           ```yaml
@@ -1994,7 +1966,6 @@ seed_examples:
                 workingDir: ${PROJECT_SOURCE}
               id: run
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Vue
         answer: |
           ```yaml
@@ -2051,7 +2022,6 @@ seed_examples:
                 workingDir: ${PROJECT_SOURCE}
               id: build
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Node.js Runtime
         answer: |
           ```yaml
@@ -2126,7 +2096,6 @@ seed_examples:
                   kind: test
                   isDefault: true
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Ollama
         answer: |
           ```yaml
@@ -2196,7 +2165,6 @@ seed_examples:
               - pullautocompletemodel
               - copyconfig
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Laravel
         answer: |
           ```yaml
@@ -2298,7 +2266,6 @@ seed_examples:
                 workingDir: ${PROJECT_SOURCE}
               id: run
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Django
         answer: |
           ```yaml
@@ -2368,7 +2335,6 @@ seed_examples:
                 group:
                   kind: debug
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Python
         answer: |
           ```yaml
@@ -2436,7 +2402,6 @@ seed_examples:
                 group:
                   kind: debug
           ```
-    questions_and_answers:
       - question: What is the a sample devfile for Universal Developer Image
         answer: |
           ```yaml
@@ -2469,7 +2434,7 @@ seed_examples:
                 cpuRequest: 1000m
                 cpuLimit: 4000m
                 mountSources: true
-          ```                  
+          ```
 document:
   repo: https://github.com/tolusha/instructlab_knowledge.git
   commit: ##REVISION##

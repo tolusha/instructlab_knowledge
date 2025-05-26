@@ -7,14 +7,14 @@ seed_examples:
     questions_and_answers:
       - question: What is the purpose of the `schemaVersion` field in a devfile?
         answer: >
-          The `schemaVersion` specifies the version of the Devfile schema being used and is required in all devfiles. 
+          The `schemaVersion` specifies the version of the Devfile schema being used and is required in all devfiles.
           It must follow a semantic versioning format like `2.3.0`:
           ```yaml
           schemaVersion: 2.3.0
           ```
       - question: What can you define under the top-level `attributes` field?
         answer: >
-          The `attributes` field allows defining free-form key-value YAML pairs used by implementations for custom behavior. 
+          The `attributes` field allows defining free-form key-value YAML pairs used by implementations for custom behavior.
           These attributes can be used globally across the devfile:
           ```yaml
           attributes:
@@ -35,7 +35,7 @@ seed_examples:
           Attributes are key-value pairs and are used to extend the devfile with custom data or to influence specific behaviors in tools that consume the devfile.
       - question: What is the role of the `variables` field and how can variables be used in a devfile?
         answer: >
-          The `variables` field allows defining key-value pairs for template-style string substitution across the devfile, using the syntax `{{variable-name}}`. 
+          The `variables` field allows defining key-value pairs for template-style string substitution across the devfile, using the syntax `{{variable-name}}`.
           They cannot be used in schemaVersion, metadata, identifiers, or enum values:
           ```yaml
           variables:
@@ -301,103 +301,103 @@ seed_examples:
       - question: Can commands be dynamically generated with variables?
         answer: >
           While runtime substitution is limited, command strings can include predefined variables like `$PROJECT_SOURCE` for basic templating.
-    - question: How to add apply command?
-      answer: >
-        To add an `apply` command in a devfile, you need to reference a `kubernetes` or `openshift` component and optionally specify a group:
-        ```yaml
-        schemaVersion: 2.3.0
-        metadata:
-          name: apply-command-devfile
-        components:
-          - name: k8s-resource
-            kubernetes:
-              uri: https://example.com/resource.yaml
-        commands:
-          - id: apply-k8s-resource
-            apply:
-              component: k8s-resource
-              label: Apply Kubernetes Resource
-              group:
-                kind: deploy
-                isDefault: true
-        ```
-        In this example, the command will apply the Kubernetes component when executed. The `group` section helps categorize the command (e.g., `build`, `run`, `test`, `debug`, `deploy`).
-    - question: What are possible groups for a command?
-      answer: >
-        In a devfile, commands can be grouped using the `group` field to categorize their purpose. The possible `kind` values for a command group are:
-        ```
-        - build
-        - run
-        - test
-        - debug
-        - deploy
-        ```
-        Each group represents the intent of the command:
-        - `build`: Commands that compile or prepare the application.
-        - `run`: Commands that start the application.
-        - `test`: Commands used for running tests.
-        - `debug`: Commands for running the application in debug mode.
-        - `deploy`: Commands that deploy the application or related resources.
-        You can also use the `isDefault` property to specify if the command is the default for its group.
-    - question: How to add exec command with all possible properties?
-      answer: >
-        To add an `exec` command with all possible properties in a devfile, define the command ID, label, command line, component, working directory, environment variables, group, hot reload capability, and custom attributes:
-        ```yaml
-        commands:
-          - id: build-command
-            exec:
-              label: Build the application
-              commandLine: npm run build
-              component: tools
-              workingDir: /projects/app
-              env:
-                - name: NODE_ENV
-                  value: production
-              group:
-                kind: build
-                isDefault: true
-              hotReloadCapable: true
-            attributes:
-              custom-key: custom-value
-        ```
-    - question: How to add apply command with all possible properties?
-      answer: >
-        To add an `apply` command with all possible properties, specify the ID, label, target component (must be `kubernetes` or `openshift`), group, and attributes:
-        ```yaml
-        commands:
-          - id: deploy-k8s
-            apply:
-              label: Apply Kubernetes Deployment
-              component: k8s-deployment
-              group:
-                kind: deploy
-                isDefault: true
-            attributes:
-              custom-key: custom-value
-        ```
-    - question: How to add composite command with all possible properties?
-      answer: >
-        A `composite` command allows grouping multiple commands together, with options for parallel execution and default grouping:
-        ```yaml
-        commands:
-          - id: setup-workspace
-            composite:
-              label: Setup Workspace
-              commands:
-                - install-deps
-                - build-command
-              parallel: false
-              group:
-                kind: build
-                isDefault: true
-            attributes:
-              custom-key: custom-value
-        ```
-        In this example, the composite command runs the `install-deps` and `build-command` commands sequentially and belongs to the `build` group.
+      - question: How to add apply command?
+        answer: >
+          To add an `apply` command in a devfile, you need to reference a `kubernetes` or `openshift` component and optionally specify a group:
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: apply-command-devfile
+          components:
+            - name: k8s-resource
+              kubernetes:
+                uri: https://example.com/resource.yaml
+          commands:
+            - id: apply-k8s-resource
+              apply:
+                component: k8s-resource
+                label: Apply Kubernetes Resource
+                group:
+                  kind: deploy
+                  isDefault: true
+          ```
+          In this example, the command will apply the Kubernetes component when executed. The `group` section helps categorize the command (e.g., `build`, `run`, `test`, `debug`, `deploy`).
+      - question: What are possible groups for a command?
+        answer: >
+          In a devfile, commands can be grouped using the `group` field to categorize their purpose. The possible `kind` values for a command group are:
+          ```
+          - build
+          - run
+          - test
+          - debug
+          - deploy
+          ```
+          Each group represents the intent of the command:
+          - `build`: Commands that compile or prepare the application.
+          - `run`: Commands that start the application.
+          - `test`: Commands used for running tests.
+          - `debug`: Commands for running the application in debug mode.
+          - `deploy`: Commands that deploy the application or related resources.
+          You can also use the `isDefault` property to specify if the command is the default for its group.
+      - question: How to add exec command with all possible properties?
+        answer: >
+          To add an `exec` command with all possible properties in a devfile, define the command ID, label, command line, component, working directory, environment variables, group, hot reload capability, and custom attributes:
+          ```yaml
+          commands:
+            - id: build-command
+              exec:
+                label: Build the application
+                commandLine: npm run build
+                component: tools
+                workingDir: /projects/app
+                env:
+                  - name: NODE_ENV
+                    value: production
+                group:
+                  kind: build
+                  isDefault: true
+                hotReloadCapable: true
+              attributes:
+                custom-key: custom-value
+          ```
+      - question: How to add apply command with all possible properties?
+        answer: >
+          To add an `apply` command with all possible properties, specify the ID, label, target component (must be `kubernetes` or `openshift`), group, and attributes:
+          ```yaml
+          commands:
+            - id: deploy-k8s
+              apply:
+                label: Apply Kubernetes Deployment
+                component: k8s-deployment
+                group:
+                  kind: deploy
+                  isDefault: true
+              attributes:
+                custom-key: custom-value
+          ```
+      - question: How to add composite command with all possible properties?
+        answer: >
+          A `composite` command allows grouping multiple commands together, with options for parallel execution and default grouping:
+          ```yaml
+          commands:
+            - id: setup-workspace
+              composite:
+                label: Setup Workspace
+                commands:
+                  - install-deps
+                  - build-command
+                parallel: false
+                group:
+                  kind: build
+                  isDefault: true
+              attributes:
+                custom-key: custom-value
+          ```
+          In this example, the composite command runs the `install-deps` and `build-command` commands sequentially and belongs to the `build` group.
   - context: The Devfile JSON schema defines the structure for describing cloud-native development environments and workspaces using version 2.3.0 of the Devfile specification. It includes a core object structure for defining components of type `volume`, `openshift`, `kubernetes` and `container`.
     questions_and_answers:
       - question: What is the purpose of the `components` field?
-        answer: > 
+        answer: >
           The `components` field is used to list all elements of the development workspace, such as containers, volumes, images, and Kubernetes or OpenShift resources. For example, to define a container, you can use:
           ```yaml
           components:
@@ -406,7 +406,7 @@ seed_examples:
                 image: quay.io/devfile/universal-developer-image:latest
           ```
       - question: What does the `attributes` field under components describe?
-        answer: > 
+        answer: >
           The `attributes` field allows for implementation-specific metadata to be included. For instance, you could add attributes to a container like so:
           ```yaml
           components:
@@ -529,7 +529,7 @@ seed_examples:
                     attributes:
                       version: v1
           ```
-          This example includes all configurable fields for a container component: image, entrypoint, resource limits and requests, mounting behavior, annotations, and network endpoints.         
+          This example includes all configurable fields for a container component: image, entrypoint, resource limits and requests, mounting behavior, annotations, and network endpoints.
       - question: What is the `endpoints` field in a container used for?
         answer: >
           The `endpoints` field defines network ports and configurations exposed by the container:
@@ -567,7 +567,7 @@ seed_examples:
             └─ exposure      - Visibility (`public`, `internal`, or `none`).
             └─ secure        - Boolean. Indicates if the endpoint is secure.
             └─ annotation    - Custom annotations for the endpoint.
-            └─ attributes    - Custom attributes for the endpoint.          
+            └─ attributes    - Custom attributes for the endpoint.
       - question: What are possible protocols for endponts?
         answer: >
           The possible protocols for endpoints in a devfile are:
@@ -579,7 +579,7 @@ seed_examples:
           - ws
           - wss
           ```
-          These protocols determine how the container's ports are exposed and accessed. For example, `http` and `https` are used for web applications, while `tcp` and `udp` are for raw network connections, and `ws`/`wss` are for WebSocket communication.          
+          These protocols determine how the container's ports are exposed and accessed. For example, `http` and `https` are used for web applications, while `tcp` and `udp` are for raw network connections, and `ws`/`wss` are for WebSocket communication.
       - question: What is defined by the `env` field in a container?
         answer: >
           The `env` field specifies environment variables to be injected into the container:
@@ -674,8 +674,8 @@ seed_examples:
             - name: ephemeral-volume
               volume:
                 ephemeral: true
-          ```          
-          This setup enables persistent or temporary storage for your container within the development environment.          
+          ```
+          This setup enables persistent or temporary storage for your container within the development environment.
       - question: What is the `image` component used for in devfile?
         answer: >
           The `image` component defines how to build a container image, either from a Dockerfile URI or a Git source:
@@ -826,7 +826,7 @@ seed_examples:
                 uri: https://example.com/postgres.yaml
           ```
       - question: What does `kubernetes.inlined` mean?
-        answer: > 
+        answer: >
           `kubernetes.inlined` allows embedding a Kubernetes manifest directly as a string in the devfile:
           ```yaml
           components:
@@ -851,7 +851,7 @@ seed_examples:
                 deployByDefault: true
           ```
       - question: What is the purpose of the `openshift` component in devfile?
-        answer: > 
+        answer: >
           The `openshift` component allows importing OpenShift resource manifests into the devworkspace:
           ```yaml
           components:
@@ -977,7 +977,7 @@ seed_examples:
                   registryUrl: https://registry.devfile.io
           ```
           These configurations allow you to build container images directly as part of the devfile-defined workspace.
-    - context: Devfile JSON Schema v2.3.0 describes the structure and configuration of cloud-native development environments using a declarative YAML format. It supports project sources (Git or Zip), lifecycle events, and dependencies, enabling rich workspaces with customizable behavior.
+  - context: Devfile JSON Schema v2.3.0 describes the structure and configuration of cloud-native development environments using a declarative YAML format. It supports project sources (Git or Zip), lifecycle events, and dependencies, enabling rich workspaces with customizable behavior.
     questions_and_answers:
       - question: What is a `dependentProject` in a devfile?
         answer: >
@@ -1131,7 +1131,7 @@ seed_examples:
               zip:
                 location: https://example.com/resources/zip-starter.zip
           ```
-        - question: What is devfile with all possible properties for git starter project?
+      - question: What is devfile with all possible properties for git starter project?
         answer: >
           A devfile with all possible properties for a git starter project includes `name`, `attributes`, `clonePath`, and full Git configuration. Here's an example:
           ```yaml
@@ -1566,7 +1566,8 @@ seed_examples:
               namespace: devops
           ```
       - question: How do I inherit from a relative parent devfile?
-        answer: Use a relative path in the `uri` field.
+        answer: >
+          Use a relative path in the `uri` field.
           ```yaml
           parent:
             uri: ../base/devfile.yaml
@@ -1594,7 +1595,7 @@ seed_examples:
       - question: Can parent devfiles define environment variables?
         answer: Yes, and they can be inherited or overridden by the child devfile’s components.
       - question: What happens if a field in the child devfile conflicts with the parent?
-        answer: The field in the child devfile overrides the one in the parent.                    
+        answer: The field in the child devfile overrides the one in the parent.
 document:
   repo: https://github.com/tolusha/instructlab_knowledge.git
   commit: ##REVISION##

@@ -272,7 +272,7 @@ seed_examples:
                 serviceAccountName: new-service-account
           ```
       - question: Where can `pod-overrides` be defined and what is the order of precedence?
-        answer: `pod-overrides` can be defined at both the component level and the devfile's top-level attributes. If defined at both levels, the devfile-level `pod-overrides` is applied first, followed by the component-level using a strategic merge patch strategy.
+        answer: The `pod-overrides` can be defined at both the component level and the devfile's top-level attributes. If defined at both levels, the devfile-level `pod-overrides` is applied first, followed by the component-level using a strategic merge patch strategy.
       - question: Can `container-overrides` and `pod-overrides` be specified in JSON format?
         answer: >
           Yes, both `container-overrides` and `pod-overrides` can be specified in JSON format:
