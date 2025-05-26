@@ -458,4 +458,4 @@ document:
   repo: https://github.com/tolusha/instructlab_knowledge.git
   commit: ##REVISION##
   patterns:
-    - devfile/05-authoring-devfiles-components.md
+    - devfile/07-authoring-devfiles-components.md
