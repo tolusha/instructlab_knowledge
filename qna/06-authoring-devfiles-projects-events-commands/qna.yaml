@@ -169,7 +169,7 @@ seed_examples:
       - question: Are there any restrictions on the number of `dependentProjects`?
         answer: There is no explicit limit defined in the devfile specification for the number of `dependentProjects`. You can define multiple projects as needed to support your development environment.
       - question: How are `dependentProjects` different from `projects` in a devfile?
-        answer: `projects` typically refer to the primary project(s) that the user will actively develop or work on. `dependentProjects` are secondary and provide support or dependencies required by the main project but are not usually edited by the user.
+        answer: The `projects` typically refer to the primary project(s) that the user will actively develop or work on. `dependentProjects` are secondary and provide support or dependencies required by the main project but are not usually edited by the user.
   - context: >
       Devfiles support defining structured commands to automate development workflows, using three main types: exec, apply, and composite. Exec commands are used to run specific actions within a container, such as compiling code or starting a development server. Apply commands trigger configuration or deployment actions, like applying Kubernetes manifests. Composite commands allow multiple commands to be executed sequentially or in parallel, enabling complex workflows. Each command can be grouped by function—such as build, run, test, debug, or deploy—to clarify its role and enable tool integration. This structured approach streamlines development processes within devfile-based environments.
     questions_and_answers:
