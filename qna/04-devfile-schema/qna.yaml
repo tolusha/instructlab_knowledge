@@ -1,0 +1,1602 @@
+created_by: Anatolii Bazko
+version: 3
+domain: devfile
+document_outline: devfile schema
+seed_examples:
+  - context: The Devfile JSON schema version defines the structure for configuring development environments through standardized specifications. It includes sections for metadata, allowing descriptive information such as name, version, and project details; variables, which enable parameterization and dynamic substitution within the devfile; and implementation-dependent attributes.
+    questions_and_answers:
+      - question: What is the purpose of the `schemaVersion` field in a devfile?
+        answer: >
+          The `schemaVersion` specifies the version of the Devfile schema being used and is required in all devfiles. 
+          It must follow a semantic versioning format like `2.3.0`:
+          ```yaml
+          schemaVersion: 2.3.0
+          ```
+      - question: What can you define under the top-level `attributes` field?
+        answer: >
+          The `attributes` field allows defining free-form key-value YAML pairs used by implementations for custom behavior. 
+          These attributes can be used globally across the devfile:
+          ```yaml
+          attributes:
+            custom-key: custom-value
+          ```
+      - question: Where attributes can be defined in a devfile
+        answer: >
+          Attributes in a devfile can be defined at various levels to provide additional metadata or configuration. They can be defined under the following sections:
+          ```
+          - Top-level of the devfile
+          - components
+          - commands
+          - projects
+          - starterProjects
+          - dependentProjects
+          - endpoints
+          ```
+          Attributes are key-value pairs and are used to extend the devfile with custom data or to influence specific behaviors in tools that consume the devfile.
+      - question: What is the role of the `variables` field and how can variables be used in a devfile?
+        answer: >
+          The `variables` field allows defining key-value pairs for template-style string substitution across the devfile, using the syntax `{{variable-name}}`. 
+          They cannot be used in schemaVersion, metadata, identifiers, or enum values:
+          ```yaml
+          variables:
+            MY_IMAGE: quay.io/devfile/universal-developer-image:latest
+          components:
+            - name: tools
+              container:
+                image: "{{MY_IMAGE}}"
+          ```
+      - question: What kind of metadata can be included under the `metadata` field?
+        answer: >
+          The `metadata` field includes optional properties such as name, version, description, tags, language, and more, providing descriptive context for the devfile:
+          ```yaml
+          metadata:
+            name: devfile
+            displayName: My Devfile
+            description: A development workspace setup for cloud-native apps
+            version: 1.0.0
+            language: JavaScript
+            projectType: nodejs
+            provider: My Company
+            website: https://example.com
+            supportUrl: https://support.example.com
+            icon: https://example.com/icon.png
+            tags:
+              - node
+              - web
+            architectures:
+              - amd64
+              - arm64
+          ```
+      - question: What is the purpose of `metadata.architectures`?
+        answer: >
+          `architectures` lists supported CPU architectures like `amd64` or `arm64`. If empty, the devfile is architecture-agnostic:
+          ```yaml
+          metadata:
+            architectures:
+              - amd64
+              - arm64
+          ```
+      - question: Should the `metadata.attributes` field be used?
+        answer: >
+          `metadata.attributes` is deprecated and should be avoided in favor of the top-level `attributes` field:
+          ```yaml
+          # Deprecated usage
+          metadata:
+            attributes:
+              legacy-key: legacy-value
+          ```
+      - question: How is `metadata.description` used?
+        answer: >
+          `description` provides a textual summary of the devfile’s purpose:
+          ```yaml
+          metadata:
+            description: Devfile for a Node.js microservice
+          ```
+      - question: What does `metadata.displayName` do?
+        answer: >
+          `displayName` gives a human-readable name for the devfile, often shown in UIs:
+          ```yaml
+          metadata:
+            displayName: Node.js Devfile
+          ```
+      - question: How is `metadata.globalMemoryLimit` used?
+        answer: >
+          `globalMemoryLimit` specifies an optional global memory cap for the workspace, like "2Gi":
+          ```yaml
+          metadata:
+            globalMemoryLimit: 2Gi
+          ```
+      - question: What is `metadata.icon` used for?
+        answer: >
+          `icon` sets a URI or relative path to an icon representing the devfile, used in visual interfaces:
+          ```yaml
+          metadata:
+            icon: https://example.com/icon.png
+          ```
+      - question: What does `metadata.language` specify?
+        answer: >
+          `language` indicates the primary programming language of the project, such as "python" or "go":
+          ```yaml
+          metadata:
+            language: python
+          ```
+      - question: What is the function of `metadata.name`?
+        answer: >
+          `name` gives a machine-readable identifier for the devfile. It's optional but recommended:
+          ```yaml
+          metadata:
+            name: my-python-devfile
+          ```
+      - question: What does `metadata.projectType` define?
+        answer: >
+          `projectType` categorizes the devfile by project type, like "springboot" or "nodejs":
+          ```yaml
+          metadata:
+            projectType: flask
+          ```
+      - question: What is the role of `metadata.provider`?
+        answer: >
+          `provider` indicates the source or organization providing the devfile:
+          ```yaml
+          metadata:
+            provider: Red Hat
+          ```
+      - question: How is `metadata.supportUrl` used?
+        answer: >
+          `supportUrl` provides a link for users to access help or documentation:
+          ```yaml
+          metadata:
+            supportUrl: https://support.example.com
+          ```
+      - question: What is the function of `metadata.tags`?
+        answer: >
+          `tags` is an optional list of keywords to describe or categorize the devfile:
+          ```yaml
+          metadata:
+            tags:
+              - java
+              - backend
+          ```
+      - question: What does `metadata.version` represent?
+        answer: >
+          `version` is a semver-compatible string representing the devfile version:
+          ```yaml
+          metadata:
+            version: 1.0.2
+          ```
+      - question: What does `metadata.website` provide?
+        answer: >
+          `website` links to the homepage for the devfile, organization, or related project:
+          ```yaml
+          metadata:
+            website: https://myproject.dev
+          ```
+  - context: >
+      The Devfile JSON schema defines the structure for describing cloud-native development environments and workspaces using version 2.3.0 of the Devfile specification. It includes a core object structure for defining commands of type `exec`, `apply`, and `composite` which are used to manage development workflow execution in containerized environments.
+    questions_and_answers:
+      - question: What does the `commands` field in a Devfile define?
+        answer: >
+          The `commands` field defines a list of devworkspace-related operations such as build, run, or deploy that can be predefined and invoked during the workspace lifecycle. These include `exec`, `apply`, and `composite` commands.
+      - question: What is required for each command object in the Devfile?
+        answer: >
+          Each command object must have an `id` and one of the following fields: `exec`, `apply`, or `composite`.
+      - question: What is the purpose of the `id` field in a command?
+        answer: >
+          The `id` field provides a unique identifier for the command, allowing it to be referenced by other commands or Devfile features such as composite commands and events.
+      - question: What format must the `id` field follow?
+        answer: >
+          The `id` must be a string matching the pattern `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` and must not exceed 63 characters.
+      - question: What is the `exec` command used for?
+        answer: >
+          The `exec` command is used to run a command-line instruction inside a specified container component:
+          ```yaml
+          - id: run-app
+            exec:
+              commandLine: npm start
+              component: tools
+              group:
+                kind: run
+                isDefault: true
+              workingDir: $PROJECT_SOURCE
+          ```
+      - question: What is the `component` field inside an `exec` command?
+        answer: It specifies the container component in which the command should run, such as `tools` in the example above.
+      - question: How can environment variables be defined for an `exec` command?
+        answer: >
+          Environment variables are defined in the `env` array, with each item specifying a `name` and `value`:
+          ```yaml
+          env:
+            - name: NODE_ENV
+              value: development
+          ```
+      - question: What does `hotReloadCapable` mean?
+        answer: >
+          `hotReloadCapable: true` means the command will not be restarted on source code change, assuming it can handle the changes itself.
+      - question: What is the `apply` command used for?
+        answer: >
+          The `apply` command applies a specific component (like Kubernetes or OpenShift components) during certain workspace events or explicitly:
+          ```yaml
+          - id: apply-db
+            apply:
+              component: postgres
+              group:
+                kind: deploy
+          ```
+      - question: What is the `composite` command in a Devfile?
+        answer: >
+          A `composite` command defines a set of sub-commands to be executed either sequentially or in parallel:
+          ```yaml
+          - id: setup-env
+            composite:
+              commands:
+                - install-deps
+                - run-linter
+              parallel: false
+              group:
+                kind: build
+          ```
+      - question: How do you define a command group in Devfile commands?
+        answer: >
+          A group is defined using the `group` field with `kind` (build, run, test, debug, deploy) and optionally `isDefault: true`.
+      - question: Can I create a command that includes multiple commands?
+        answer: Yes, you can use a `composite` command to reference multiple commands using their `id`s.
+      - question: Can `label` be used to describe commands?
+        answer: >
+          Yes, `label` provides a human-readable label for use in UI tools, such as:
+          ```yaml
+          label: "Start the Dev Server"
+          ```
+      - question: What types of values are accepted in the `commands` field?
+        answer: >
+          Each value must be an object with an `id` and one of the following: `exec`, `apply`, or `composite`.
+      - question: What happens if no `apply` command is defined for a component?
+        answer: If no `apply` command exists and `deployByDefault` is not false, the component is automatically applied at devworkspace start.
+      - question: Can `composite` commands be parallelized?
+        answer: >
+          Yes, by setting `parallel: true`, the sub-commands are executed concurrently.
+      - question: Can the `exec` command define a working directory?
+        answer: >
+          Yes, `workingDir` can be set to specify where the command should be executed:
+          ```yaml
+          workingDir: $PROJECTS_ROOT/my-app
+          ```
+      - question: Can we reference variables like `$PROJECT_SOURCE` in `exec` commands?
+        answer: >
+          Yes, special variables like `$PROJECT_SOURCE` and `$PROJECTS_ROOT` are supported in fields like `commandLine` and `workingDir`.
+      - question: Are there any restrictions on `attributes` fields?
+        answer: >
+          No, `attributes` are free-form and implementation-dependent, allowing custom metadata to be added.
+      - question: How can I ensure a build command is the default?
+        answer: >
+          Mark the command with `group.kind: build` and `isDefault: true`:
+          ```yaml
+          group:
+            kind: build
+            isDefault: true
+          ```
+      - question: How do you apply a Kubernetes component using a command?
+        answer: >
+          Use an `apply` command referencing the Kubernetes component name:
+          ```yaml
+          - id: deploy-k8s
+            apply:
+              component: my-k8s-component
+              group:
+                kind: deploy
+          ```
+      - question: Can I chain an `apply` command in a `composite`?
+        answer: >
+          Yes, the `composite` command can include the `id` of an `apply` command:
+          ```yaml
+          - id: setup
+            composite:
+              commands:
+                - apply-k8s
+                - run-server
+          ```
+      - question: >
+          What happens if multiple commands are marked `isDefault: true` for the same kind?
+        answer: >
+          It leads to an invalid Devfile since only one command per kind can be default.
+      - question: Can commands be dynamically generated with variables?
+        answer: >
+          While runtime substitution is limited, command strings can include predefined variables like `$PROJECT_SOURCE` for basic templating.
+    - question: How to add apply command?
+      answer: >
+        To add an `apply` command in a devfile, you need to reference a `kubernetes` or `openshift` component and optionally specify a group:
+        ```yaml
+        schemaVersion: 2.3.0
+        metadata:
+          name: apply-command-devfile
+        components:
+          - name: k8s-resource
+            kubernetes:
+              uri: https://example.com/resource.yaml
+        commands:
+          - id: apply-k8s-resource
+            apply:
+              component: k8s-resource
+              label: Apply Kubernetes Resource
+              group:
+                kind: deploy
+                isDefault: true
+        ```
+        In this example, the command will apply the Kubernetes component when executed. The `group` section helps categorize the command (e.g., `build`, `run`, `test`, `debug`, `deploy`).
+    - question: What are possible groups for a command?
+      answer: >
+        In a devfile, commands can be grouped using the `group` field to categorize their purpose. The possible `kind` values for a command group are:
+        ```
+        - build
+        - run
+        - test
+        - debug
+        - deploy
+        ```
+        Each group represents the intent of the command:
+        - `build`: Commands that compile or prepare the application.
+        - `run`: Commands that start the application.
+        - `test`: Commands used for running tests.
+        - `debug`: Commands for running the application in debug mode.
+        - `deploy`: Commands that deploy the application or related resources.
+        You can also use the `isDefault` property to specify if the command is the default for its group.
+    - question: How to add exec command with all possible properties?
+      answer: >
+        To add an `exec` command with all possible properties in a devfile, define the command ID, label, command line, component, working directory, environment variables, group, hot reload capability, and custom attributes:
+        ```yaml
+        commands:
+          - id: build-command
+            exec:
+              label: Build the application
+              commandLine: npm run build
+              component: tools
+              workingDir: /projects/app
+              env:
+                - name: NODE_ENV
+                  value: production
+              group:
+                kind: build
+                isDefault: true
+              hotReloadCapable: true
+            attributes:
+              custom-key: custom-value
+        ```
+    - question: How to add apply command with all possible properties?
+      answer: >
+        To add an `apply` command with all possible properties, specify the ID, label, target component (must be `kubernetes` or `openshift`), group, and attributes:
+        ```yaml
+        commands:
+          - id: deploy-k8s
+            apply:
+              label: Apply Kubernetes Deployment
+              component: k8s-deployment
+              group:
+                kind: deploy
+                isDefault: true
+            attributes:
+              custom-key: custom-value
+        ```
+    - question: How to add composite command with all possible properties?
+      answer: >
+        A `composite` command allows grouping multiple commands together, with options for parallel execution and default grouping:
+        ```yaml
+        commands:
+          - id: setup-workspace
+            composite:
+              label: Setup Workspace
+              commands:
+                - install-deps
+                - build-command
+              parallel: false
+              group:
+                kind: build
+                isDefault: true
+            attributes:
+              custom-key: custom-value
+        ```
+        In this example, the composite command runs the `install-deps` and `build-command` commands sequentially and belongs to the `build` group.
+  - context: The Devfile JSON schema defines the structure for describing cloud-native development environments and workspaces using version 2.3.0 of the Devfile specification. It includes a core object structure for defining components of type `volume`, `openshift`, `kubernetes` and `container`.
+    questions_and_answers:
+      - question: What is the purpose of the `components` field?
+        answer: > 
+          The `components` field is used to list all elements of the development workspace, such as containers, volumes, images, and Kubernetes or OpenShift resources. For example, to define a container, you can use:
+          ```yaml
+          components:
+            - name: tools
+              container:
+                image: quay.io/devfile/universal-developer-image:latest
+          ```
+      - question: What does the `attributes` field under components describe?
+        answer: > 
+          The `attributes` field allows for implementation-specific metadata to be included. For instance, you could add attributes to a container like so:
+          ```yaml
+          components:
+            - name: custom
+              container:
+                image: node
+                attributes:
+                  my-custom-attribute: true
+          ```
+      - question: How do you configure a container in the devfile?
+        answer: >
+          A container is configured using the `container` object under a component, which must include an `image`. Optional fields like `command`, `args`, `env`, etc., can also be provided:
+          ```yaml
+          components:
+            - name: my-container
+              container:
+                image: my-image:latest
+                command: ['sleep']
+                args: ['infinity']
+                mountSources: true
+          ```
+      - question: What does the `annotation` property under a container component do?
+        answer: >
+          The `annotation` field allows adding Kubernetes-specific annotations to deployment or service resources associated with the container:
+          ```yaml
+          components:
+            - name: annotated-container
+              container:
+                image: my-image
+                annotation:
+                  deployment:
+                    sidecar.istio.io/inject: "false"
+          ```
+      - question: What is the use of the `args` field in a container component?
+        answer: >
+          The `args` field supplies arguments to the command that runs in the container:
+          ```yaml
+          components:
+            - name: args-example
+              container:
+                image: busybox
+                command: ['echo']
+                args: ['Hello, Devfile!']
+          ```
+      - question: What is the purpose of the `command` field in a container?
+        answer: >
+          The `command` field overrides the default command specified in the container image:
+          ```yaml
+          components:
+            - name: cmd-example
+              container:
+                image: busybox
+                command: ['sleep']
+                args: ['infinity']
+          ```
+      - question: What does `cpuLimit` define for a container?
+        answer: >
+          `cpuLimit` sets the maximum amount of CPU the container is allowed to use:
+          ```yaml
+          components:
+            - name: resource-container
+              container:
+                image: node
+                cpuLimit: "500m"
+          ```
+      - question: What is the `cpuRequest` field used for?
+        answer: >
+          `cpuRequest` sets the minimum CPU that is guaranteed for the container:
+          ```yaml
+          components:
+            - name: resource-container
+              container:
+                image: node
+                cpuRequest: "250m"
+          ```
+      - question: What does `dedicatedPod` mean in a container configuration?
+        answer: >
+          `dedicatedPod` determines whether the container runs in a separate pod rather than sharing the main devworkspace pod:
+          ```yaml
+          components:
+            - name: isolated-container
+              container:
+                image: node
+                dedicatedPod: true
+          ```
+      - question: What is devfile with all fields for container component?
+        answer: >
+          A devfile with all possible fields for a `container` component includes full runtime, resource, and endpoint configuration:
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: full-container-devfile
+          components:
+            - name: my-full-container
+              container:
+                image: myregistry/my-image:1.0
+                command: ["/entrypoint.sh"]
+                args: ["--enable-feature"]
+                cpuLimit: "1000m"
+                cpuRequest: "500m"
+                memoryLimit: "2Gi"
+                memoryRequest: "1Gi"
+                dedicatedPod: true
+                mountSources: true
+                sourceMapping: /projects
+                annotation:
+                  deployment:
+                    my-annotation-key: my-annotation-value
+                  service:
+                    my-service-annotation: svc-annotation-value
+                endpoints:
+                  - name: http-service
+                    targetPort: 8080
+                    protocol: http
+                    path: /api
+                    exposure: public
+                    secure: false
+                    annotation:
+                      ingress.kubernetes.io/rewrite-target: /
+                    attributes:
+                      version: v1
+          ```
+          This example includes all configurable fields for a container component: image, entrypoint, resource limits and requests, mounting behavior, annotations, and network endpoints.         
+      - question: What is the `endpoints` field in a container used for?
+        answer: >
+          The `endpoints` field defines network ports and configurations exposed by the container:
+          ```yaml
+          components:
+            - name: web
+              container:
+                image: nginx
+                endpoints:
+                  - name: http
+                    targetPort: 80
+          ```
+      - question: What are possible fields and theirs descriptions for container component?
+        answer: >
+          The `container` component in a devfile supports several fields. Here are the possible fields and their descriptions:
+          ```
+          image              - Required. The container image to use.
+          args               - Optional. Arguments to pass to the container entrypoint.
+          command            - Optional. The command to run as the container entrypoint.
+          cpuLimit           - Optional. Maximum amount of CPU the container can use (e.g., "1000m").
+          cpuRequest         - Optional. Amount of CPU requested for scheduling (e.g., "500m").
+          memoryLimit        - Optional. Maximum amount of memory the container can use (e.g., "1Gi").
+          memoryRequest      - Optional. Amount of memory requested for scheduling (e.g., "512Mi").
+          dedicatedPod       - Optional. Boolean. If true, this container runs in its own pod.
+          mountSources       - Optional. Boolean. If true, mounts the source code into the container.
+          sourceMapping      - Optional. Path where the project source code is mounted inside the container.
+          annotation         - Optional. Custom annotations for `deployment` and `service` resources.
+            └─ deployment    - Key-value pairs for Kubernetes deployment annotations.
+            └─ service       - Key-value pairs for Kubernetes service annotations.
+          endpoints          - Optional. List of network endpoints exposed by the container.
+            └─ name          - Name of the endpoint.
+            └─ targetPort    - Port number inside the container.
+            └─ protocol      - Protocol used (`http`, `https`, `tcp`, `udp`, `ws`, `wss`).
+            └─ path          - URL path (for HTTP/HTTPS endpoints).
+            └─ exposure      - Visibility (`public`, `internal`, or `none`).
+            └─ secure        - Boolean. Indicates if the endpoint is secure.
+            └─ annotation    - Custom annotations for the endpoint.
+            └─ attributes    - Custom attributes for the endpoint.          
+      - question: What are possible protocols for endponts?
+        answer: >
+          The possible protocols for endpoints in a devfile are:
+          ```
+          - http
+          - https
+          - tcp
+          - udp
+          - ws
+          - wss
+          ```
+          These protocols determine how the container's ports are exposed and accessed. For example, `http` and `https` are used for web applications, while `tcp` and `udp` are for raw network connections, and `ws`/`wss` are for WebSocket communication.          
+      - question: What is defined by the `env` field in a container?
+        answer: >
+          The `env` field specifies environment variables to be injected into the container:
+          ```yaml
+          components:
+            - name: env-example
+              container:
+                image: node
+                env:
+                  - name: NODE_ENV
+                    value: development
+          ```
+      - question: What does `memoryLimit` represent in a container component?
+        answer: >
+          `memoryLimit` sets the maximum amount of memory available to the container:
+          ```yaml
+          components:
+            - name: mem-container
+              container:
+                image: node
+                memoryLimit: "1Gi"
+          ```
+      - question: What is the role of the `memoryRequest` field?
+        answer: >
+          `memoryRequest` defines the guaranteed minimum memory for the container:
+          ```yaml
+          components:
+            - name: mem-container
+              container:
+                image: node
+                memoryRequest: "512Mi"
+          ```
+      - question: What does `mountSources` toggle in a container?
+        answer: >
+          `mountSources` enables or disables automatic mounting of project sources into the container:
+          ```yaml
+          components:
+            - name: source-mount
+              container:
+                image: node
+                mountSources: true
+          ```
+      - question: What does `sourceMapping` define?
+        answer: >
+          `sourceMapping` defines the directory path inside the container where project sources will be mounted:
+          ```yaml
+          components:
+            - name: source-map
+              container:
+                image: node
+                mountSources: true
+                sourceMapping: /home/user/project
+          ```
+      - question: What does `volumeMounts` configure in a container?
+        answer: >
+          `volumeMounts` lists volumes to mount inside the container at specified paths:
+          ```yaml
+          components:
+            - name: app
+              container:
+                image: node
+                volumeMounts:
+                  - name: data
+                    path: /data
+            - name: data
+              volume:
+                size: 1Gi
+          ```
+      - question: How to add volume component?
+        answer: >
+          To add a volume in a devfile, you must define a `volume` component and reference it in a `container` component using the same name. Here's an example with a persistent volume:
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: volume-example-devfile
+          components:
+            - name: my-volume
+              volume:
+                size: 1Gi
+            - name: app-container
+              container:
+                image: myregistry/app:latest
+                mountSources: true
+                volumeMounts:
+                  - name: my-volume
+                    path: /data
+                command: ['sleep', 'infinity']
+          ```
+          To create an ephemeral volume (deleted when the workspace stops), use `ephemeral: true` instead of `size`:
+          ```yaml
+          components:
+            - name: ephemeral-volume
+              volume:
+                ephemeral: true
+          ```          
+          This setup enables persistent or temporary storage for your container within the development environment.          
+      - question: What is the `image` component used for in devfile?
+        answer: >
+          The `image` component defines how to build a container image, either from a Dockerfile URI or a Git source:
+          ```yaml
+          components:
+            - name: backend-image
+              image:
+                imageName: my-backend:latest
+                autoBuild: true
+                dockerfile:
+                  uri: ./Dockerfile
+                  buildContext: .
+          ```
+      - question: How to override kubernetes container spec properties?
+        answer: >
+          To override Kubernetes container spec properties in a devfile, you must use the `attributes.container-overrides` field inside a `container` component. Only valid Kubernetes container spec properties can be overridden (e.g., `resources`, `securityContext`).
+          ```yaml
+          components:
+            - name: tools
+              container:
+                image: quay.io/devfile/universal-developer-image:latest
+                attributes:
+                  container-overrides:
+                    securityContext:
+                      runAsUser: 1000
+          ```
+      - question: What properties can't be overridden for a container?
+        answer: >
+          In a devfile, the following properties **cannot** be overridden using `container-overrides`:
+          - `image`
+          - `name`
+          - `ports`
+          - `env`
+          - `volumeMounts`
+          - `command`
+          - `args
+      - question: Can I override the container command or args using container-overrides?
+        answer: No, `command` and `args` are not allowed to be overridden using `container-overrides`. These must be defined directly within the container component itself.
+      - question: How to override container resources?
+        answer: >
+          To override container resources in a devfile, use the `attributes.container-overrides` field inside the desired `container` component. You can specify both resource `requests` and `limits` for `cpu` and `memory`:
+          ```yaml
+          components:
+            - name: tools
+              container:
+                image: quay.io/devfile/universal-developer-image:latest
+                attributes:
+                  container-overrides:
+                    resources:
+                      requests:
+                        memory: "512Mi"
+                        cpu: "250m"
+                      limits:
+                        memory: "1Gi"
+                        cpu: "500m"
+          ```
+          This configuration sets resource requests and limits for the container's CPU and memory usage.
+      - question: How to override kuberntes pod spec properties?
+        answer: >
+          To override pod properties in a devfile, use the `attributes.pod-overrides` field either at the top level of the devfile. You can only override valid Kubernetes pod spec fields, except `containers`, `initContainers`, and `volumes`:
+          ```yaml
+          attributes:
+            pod-overrides:
+              spec:
+                nodeSelector:
+                  disktype: ssd
+          ```
+          This configuration ensures the pod is scheduled on nodes with the specified `disktype` label.
+      - question: What properties can't be overridden for a pod?
+        answer: >
+          In a devfile, the following properties **cannot** be overridden using `pod-overrides`:
+          - `containers`
+          - `initContainers`
+          - `volumes`
+      - question: Can I use pod-overrides to change the container's image?
+        answer: No, container images cannot be overridden using `pod-overrides`. The `image` must be defined directly in the `container` component of the devfile.
+      - question: What does the `autoBuild` field do in an image component?
+        answer: >
+          `autoBuild` determines whether the image should be built automatically when the devworkspace starts:
+          ```yaml
+          components:
+            - name: backend-image
+              image:
+                imageName: my-backend:latest
+                autoBuild: true
+                dockerfile:
+                  uri: ./Dockerfile
+          ```
+      - question: How is the `dockerfile.uri` used?
+        answer: >
+          `dockerfile.uri` provides the location of a Dockerfile for image building:
+          ```yaml
+          components:
+            - name: app-image
+              image:
+                imageName: my-app
+                dockerfile:
+                  uri: ./Dockerfile
+          ```
+      - question: What does the `dockerfile.buildContext` define?
+        answer: >
+          `dockerfile.buildContext` sets the root directory used as context for building the image:
+          ```yaml
+          components:
+            - name: image-example
+              image:
+                imageName: my-image
+                dockerfile:
+                  uri: ./Dockerfile
+                  buildContext: ./src
+          ```
+      - question: How do you use a Dockerfile from Git in the image component?
+        answer: >
+          You can use a Dockerfile from a Git repository by specifying `dockerfile.git` with remotes and file location:
+          ```yaml
+          components:
+            - name: git-image
+              image:
+                imageName: my-image
+                dockerfile:
+                  git:
+                    remotes:
+                      origin: https://github.com/example/repo.git
+                    fileLocation: Dockerfile
+                    checkoutFrom:
+                      remote: origin
+                      revision: main
+          ```
+      - question: What does `rootRequired` mean in a dockerfile definition?
+        answer: >
+          `rootRequired` indicates whether a privileged builder pod is required to build the image:
+          ```yaml
+          components:
+            - name: root-image
+              image:
+                imageName: my-root-image
+                dockerfile:
+                  uri: ./Dockerfile
+                  rootRequired: true
+          ```
+      - question: How is `kubernetes.uri` used?
+        answer: >
+          `kubernetes.uri` defines the URL or path to a Kubernetes manifest to be imported into the devworkspace:
+          ```yaml
+          components:
+            - name: k8s-db
+              kubernetes:
+                uri: https://example.com/postgres.yaml
+          ```
+      - question: What does `kubernetes.inlined` mean?
+        answer: > 
+          `kubernetes.inlined` allows embedding a Kubernetes manifest directly as a string in the devfile:
+          ```yaml
+          components:
+            - name: k8s-config
+              kubernetes:
+                inlined: |
+                  apiVersion: v1
+                  kind: ConfigMap
+                  metadata:
+                    name: my-config
+                  data:
+                    config.json: "{}"
+          ```
+      - question: What is the function of `deployByDefault` in Kubernetes or OpenShift components?
+        answer: >
+          `deployByDefault` controls whether the resource should be automatically deployed at devworkspace startup:
+          ```yaml
+          components:
+            - name: openshift-app
+              openshift:
+                uri: ./route.yaml
+                deployByDefault: true
+          ```
+      - question: What is the purpose of the `openshift` component in devfile?
+        answer: > 
+          The `openshift` component allows importing OpenShift resource manifests into the devworkspace:
+          ```yaml
+          components:
+            - name: openshift-svc
+              openshift:
+                inlined: |
+                  apiVersion: v1
+                  kind: Service
+                  metadata:
+                    name: my-service
+          ```
+      - question: What does the `ephemeral` field in a volume component mean?
+        answer: >
+          `ephemeral` defines whether the volume should persist across restarts or not. When set to true, the volume is deleted with the workspace:
+          ```yaml
+          components:
+            - name: temp-storage
+              volume:
+                ephemeral: true
+                size: 1Gi
+          ```
+      - question: What does the `size` property in a volume component do?
+        answer: >
+          The `size` property sets the allocated size of the volume:
+          ```yaml
+          components:
+            - name: data-storage
+              volume:
+                size: 2Gi
+          ```
+      - question: Which components can be added?
+        answer: >
+          In a devfile, you can add the following types of components:
+          ```
+          - container
+          - kubernetes
+          - openshift
+          - image
+          - volume
+          ```
+          Each component type serves a different purpose. For example, `container` defines a runtime environment, `kubernetes` and `openshift` can reference or inline platform-specific resources, `image` defines container image build configurations, and `volume` provides persistent or ephemeral storage.
+      - question: What are ways to add openshift or kubernetes components?
+        answer: >
+          In a devfile, `openshift` or `kubernetes` components can be added using either of the following ways:
+          ```
+          - uri: Reference to an external file containing the Kubernetes or OpenShift resource.
+          - inlined: Directly embed the resource manifest within the devfile.
+          ```
+          Example using `uri`:
+          ```yaml
+          components:
+            - name: my-k8s-component
+              kubernetes:
+                uri: https://example.com/my-resource.yaml
+          ```
+          Example using `inlined`:
+          ```yaml
+          components:
+            - name: my-k8s-component
+              kubernetes:
+                inlined: |
+                  apiVersion: v1
+                  kind: ConfigMap
+                  metadata:
+                    name: example-config
+                  data:
+                    key: value
+          ```
+      - question: How to add container component?
+        answer: >
+          To add a container component in a devfile, you need to specify at minimum the `name` and `image`. If the container is not using the universal development image, you should also add `command: ['sleep', 'infinity']` and `mountSources: true`:
+          ```yaml
+          components:
+            - name: my-container
+              container:
+                image: my-custom-image:latest
+                command: ['sleep', 'infinity']
+                mountSources: true
+          ```
+          Additional optional properties include `cpuLimit`, `memoryRequest`, `endpoints`, and more to customize the container behavior.
+      - question: How to add image component?
+        answer: >
+          To add an `image` component in a devfile, you need to define the image name and provide the build context. You can specify the Dockerfile location using a `uri`, a `git` reference, or a `devfileRegistry` reference. Here's an example using a Dockerfile from a URI:
+          ```yaml
+          components:
+            - name: my-image
+              image:
+                imageName: myregistry/my-image:1.0
+                autoBuild: true
+                dockerfile:
+                  uri: ./Dockerfile
+                  buildContext: .
+                  args:
+                    APP_ENV: production
+                  rootRequired: false
+          ```
+          You can also use a Git reference:
+          ```yaml
+          components:
+            - name: my-image
+              image:
+                imageName: myregistry/my-image:1.0
+                autoBuild: true
+                dockerfile:
+                  git:
+                    checkoutFrom:
+                      remote: origin
+                      revision: main
+                    fileLocation: /docker
+                    remotes:
+                      origin: https://github.com/myorg/my-repo.git
+                  buildContext: .
+          ```
+          Or use a Devfile registry image:
+          ```yaml
+          components:
+            - name: my-image
+              image:
+                imageName: myregistry/my-image:1.0
+                autoBuild: true
+                devfileRegistry:
+                  id: my-registry-image
+                  registryUrl: https://registry.devfile.io
+          ```
+          These configurations allow you to build container images directly as part of the devfile-defined workspace.
+    - context: Devfile JSON Schema v2.3.0 describes the structure and configuration of cloud-native development environments using a declarative YAML format. It supports project sources (Git or Zip), lifecycle events, and dependencies, enabling rich workspaces with customizable behavior.
+    questions_and_answers:
+      - question: What is a `dependentProject` in a devfile?
+        answer: >
+          A `dependentProject` defines additional source code repositories (either Git or Zip) related to the main project that should be cloned into the devworkspace.
+          ```yaml
+          dependentProjects:
+            - name: dependency-lib
+              git:
+                remotes:
+                  origin: https://github.com/example/dependency-lib.git
+          ```
+      - question: What does the `attributes` field inside `dependentProjects` represent?
+        answer: >
+          The `attributes` field allows specifying free-form key-value pairs for implementation-specific configuration.
+          ```yaml
+          dependentProjects:
+            - name: dependency-lib
+              git:
+                remotes:
+                  origin: https://github.com/example/dependency-lib.git
+              attributes:
+                purpose: helper-library
+          ```
+      - question: What is `clonePath` in a `dependentProject`?
+        answer: >
+          `clonePath` defines where the project should be cloned relative to the workspace root.
+          ```yaml
+          dependentProjects:
+            - name: dependency-lib
+              clonePath: libs/dependency-lib
+              git:
+                remotes:
+                  origin: https://github.com/example/dependency-lib.git
+          ```
+      - question: What does the `git` field define in a devfile project?
+        answer: >
+          The `git` field specifies a Git source including remotes and optional checkout configuration.
+          ```yaml
+          projects:
+            - name: backend
+              git:
+                remotes:
+                  origin: https://github.com/example/backend.git
+                checkoutFrom:
+                  remote: origin
+                  revision: main
+          ```
+      - question: What is the purpose of `checkoutFrom` in a git project?
+        answer: >
+          `checkoutFrom` lets you specify which remote and revision (branch, tag, or commit) to check out from the Git repository.
+          ```yaml
+          projects:
+            - name: app
+              git:
+                remotes:
+                  origin: https://github.com/example/app.git
+                checkoutFrom:
+                  remote: origin
+                  revision: develop
+          ```
+      - question: How are `remotes` used in git configuration?
+        answer: >
+          `remotes` define one or more remote URLs from which the Git project can be cloned.
+          ```yaml
+          projects:
+            - name: sample
+              git:
+                remotes:
+                  origin: https://github.com/user/sample.git
+          ```
+      - question: What does the `zip` field do in a devfile project?
+        answer: >
+          The `zip` field defines a source archive (zip file) that will be extracted into the devworkspace.
+          ```yaml
+          starterProjects:
+            - name: demo
+              zip:
+                location: file:///home/user/demo.zip
+          ```
+      - question: What is the purpose of the `name` field in a project or dependent project?
+        answer: >
+          `name` uniquely identifies the project and must follow specific naming rules.
+          ```yaml
+          projects:
+            - name: my-app
+              git:
+                remotes:
+                  origin: https://github.com/org/my-app.git
+          ```
+      - question: What is devfile with all possible properties for git project?
+        answer: >
+          A devfile with all possible properties for a Git project includes `name`, `attributes`, `clonePath`, and full Git configuration. Here's an example:
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: full-git-project-devfile
+          components:
+            - name: tools
+              container:
+                image: quay.io/devfile/universal-developer-image:latest
+          projects:
+            - name: full-git-project
+              attributes:
+                custom-key: custom-value
+              clonePath: /projects/my-full-app
+              git:
+                remotes:
+                  origin: https://github.com/myorg/my-repo.git
+                  upstream: https://github.com/upstreamorg/upstream-repo.git
+                checkoutFrom:
+                  remote: origin
+                  revision: main
+          ```
+          This devfile demonstrates how to fully configure a Git-based project in the `projects` section, including support for custom attributes, multiple remotes, and specific revision checkout.
+      - question: What is devfile with all possible properties for zip project?
+        answer: >
+          A devfile with all possible properties for a zip project includes `name`, `attributes`, `clonePath`, and `zip.location`. Here's an example:
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: full-zip-project-devfile
+          components:
+            - name: tools
+              container:
+                image: quay.io/devfile/universal-developer-image:latest
+          projects:
+            - name: full-zip-project
+              attributes:
+                custom-key: custom-value
+              clonePath: /projects/my-zip-app
+              zip:
+                location: https://example.com/artifacts/my-zip-project.zip
+          ```
+          This configuration allows the devfile tooling to download and extract a zip archive into the specified clone path, with optional custom attributes.
+      - question: What is devfile with all possible properties for zip starter project?
+        answer: >
+          A devfile with all possible properties for a zip starter project includes `name`, `attributes`, `clonePath`, and `zip.location`. Here's an example:
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: zip-starter-project-devfile
+          components:
+            - name: tools
+              container:
+                image: quay.io/devfile/universal-developer-image:latest
+          starterProjects:
+            - name: zip-starter
+              attributes:
+                category: demo
+              clonePath: /projects/zip-starter
+              zip:
+                location: https://example.com/resources/zip-starter.zip
+          ```
+        - question: What is devfile with all possible properties for git starter project?
+        answer: >
+          A devfile with all possible properties for a git starter project includes `name`, `attributes`, `clonePath`, and full Git configuration. Here's an example:
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: git-starter-project-devfile
+          components:
+            - name: tools
+              container:
+                image: quay.io/devfile/universal-developer-image:latest
+          starterProjects:
+            - name: git-starter
+              attributes:
+                category: demo
+              clonePath: /projects/git-starter
+              git:
+                remotes:
+                  origin: https://github.com/myorg/git-starter-repo.git
+                  upstream: https://github.com/upstreamorg/upstream-repo.git
+                checkoutFrom:
+                  remote: origin
+                  revision: main
+          ```
+          These starter projects provide initial source code templates from either a Git repository or a downloadable zip archive, and can include metadata through attributes.
+      - question: What is devfile with all possible properties for zip dependent project?
+        answer: >
+          A devfile with all possible properties for a zip dependent project includes `name`, `attributes`, `clonePath`, and `zip.location`. Here's an example:
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: zip-dependent-project-devfile
+          components:
+            - name: tools
+              container:
+                image: quay.io/devfile/universal-developer-image:latest
+          dependentProjects:
+            - name: zip-dependency
+              attributes:
+                type: library
+              clonePath: /projects/dependencies/zip-lib
+              zip:
+                location: https://example.com/dependencies/zip-lib.zip
+          ```
+      - question: What is devfile with all possible properties for git dependent project?
+        answer: >
+          A devfile with all possible properties for a git dependent project includes `name`, `attributes`, `clonePath`, and detailed Git configuration. Here's an example:
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: git-dependent-project-devfile
+          components:
+            - name: tools
+              container:
+                image: quay.io/devfile/universal-developer-image:latest
+          dependentProjects:
+            - name: git-dependency
+              attributes:
+                type: library
+              clonePath: /projects/dependencies/git-lib
+              git:
+                remotes:
+                  origin: https://github.com/myorg/git-lib.git
+                  upstream: https://github.com/upstreamorg/git-lib.git
+                checkoutFrom:
+                  remote: origin
+                  revision: develop
+          ```
+          These dependent projects are used to bring in additional codebases or libraries needed for the main project, and can come from either Git or ZIP sources with full configuration options.
+      - question: What are `events` in a devfile?
+        answer: >
+          `events` bind command IDs to devworkspace lifecycle events like `preStart`, `postStart`, `preStop`, and `postStop`.
+          ```yaml
+          events:
+            preStart:
+              - install-deps
+            postStart:
+              - start-server
+          ```
+      - question: What is `postStart` used for?
+        answer: >
+          `postStart` contains command IDs that should be run after the devworkspace has fully started.
+          ```yaml
+          events:
+            postStart:
+              - run-tests
+          ```
+      - question: What does `postStop` do in events?
+        answer: >
+          `postStop` specifies commands to be run after the workspace is stopped.
+          ```yaml
+          events:
+            postStop:
+              - cleanup
+          ```
+      - question: What is the `preStart` event used for?
+        answer: >
+          `preStart` commands are run before the devworkspace starts, often as init containers.
+
+          ```yaml
+          events:
+            preStart:
+              - prepare-env
+          ```
+      - question: What is the function of `preStop` in events?
+        answer: >
+          `preStop` defines commands to be executed before the devworkspace stops.
+          ```yaml
+          events:
+            preStop:
+              - notify-shutdown
+          ```
+      - question: What is a `starterProject` in a devfile?
+        answer: >
+          `starterProject` provides an initial codebase that can be used to bootstrap new projects.
+          ```yaml
+          starterProjects:
+            - name: node-starter
+              description: A basic Node.js starter project
+              git:
+                remotes:
+                  origin: https://github.com/nodejs/starter.git
+          ```
+      - question: What is the `description` of a starter project?
+        answer: >
+          It provides a human-readable explanation of what the starter project does.
+          ```yaml
+          starterProjects:
+            - name: basic-api
+              description: REST API using Express
+              git:
+                remotes:
+                  origin: https://github.com/org/basic-api.git
+          ```
+      - question: What is the `subDir` in a starterProject?
+        answer: >
+          `subDir` lets you specify a sub-directory from the source to be used as the project root.
+          ```yaml
+          starterProjects:
+            - name: java-microservice
+              git:
+                remotes:
+                  origin: https://github.com/org/java-microservices.git
+              subDir: services/payment
+          ```
+      - question: Can a project have multiple remotes?
+        answer: >
+          Yes, but if multiple remotes are defined, `checkoutFrom.remote` becomes required.
+          ```yaml
+          projects:
+            - name: multi-remote-app
+              git:
+                remotes:
+                  origin: https://github.com/org/app.git
+                  upstream: https://github.com/upstream/app.git
+                checkoutFrom:
+                  remote: origin
+                  revision: main
+          ```
+      - question: What is the `location` property in a zip project?
+        answer: >
+          It defines the URI to the zip file containing the source code.
+          ```yaml
+          projects:
+            - name: zipped-code
+              zip:
+                location: file:///workspace/resources/code.zip
+          ```
+      - question: What format must project names follow?
+        answer: >
+          Project names must match the regex `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` and be up to 63 characters long.
+          ```yaml
+          projects:
+            - name: valid-name-123
+              git:
+                remotes:
+                  origin: https://github.com/example/repo.git
+          ```
+      - question: Can `starterProjects` have a zip source?
+        answer: >
+          Yes, a starter project can specify a zip archive instead of a Git repo.
+          ```yaml
+          starterProjects:
+            - name: zipped-starter
+              zip:
+                location: file:///path/to/starter.zip
+          ```
+      - question: Is `checkoutFrom.revision` required?
+        answer: >
+          No, it is optional and defaults to the default branch if not specified.
+          ```yaml
+          projects:
+            - name: webapp
+              git:
+                remotes:
+                  origin: https://github.com/org/webapp.git
+          ```
+      - question: Can `clonePath` point to a directory outside the project root?
+        answer: >
+          No, paths with `..` are invalid and `clonePath` must be relative and contained within the root.
+          ```yaml
+          dependentProjects:
+            - name: lib
+              clonePath: libs/lib
+              git:
+                remotes:
+                  origin: https://github.com/example/lib.git
+          ```
+      - question: Can `attributes` be used in all project types?
+        answer: >
+          Yes, `attributes` can be specified in `projects`, `dependentProjects`, and `starterProjects`.
+          ```yaml
+          projects:
+            - name: annotated
+              git:
+                remotes:
+                  origin: https://github.com/example/annotated.git
+              attributes:
+                team: dev
+          ```
+      - question: How is a zip source location specified?
+        answer: >
+          The zip source should be a file URI like `file://path/to/file.zip`.
+          ```yaml
+          dependentProjects:
+            - name: archive-lib
+              zip:
+                location: file:///data/lib.zip
+          ```
+      - question: Can `starterProjects` include both `subDir` and `description`?
+        answer: >
+          Yes, both can be provided for additional context and control.
+          ```yaml
+          starterProjects:
+            - name: go-service
+              description: Golang microservice template
+              git:
+                remotes:
+                  origin: https://github.com/example/go-template.git
+              subDir: services/api
+          ```
+      - question: Can I define multiple `starterProjects`?
+        answer: >
+          Yes, you can define as many starter projects as needed.
+          ```yaml
+          starterProjects:
+            - name: react-starter
+              git:
+                remotes:
+                  origin: https://github.com/example/react-starter.git
+            - name: vue-starter
+              git:
+                remotes:
+                  origin: https://github.com/example/vue-starter.git
+          ```
+      - question: What happens if no `clonePath` is specified?
+        answer: >
+          The default path is the project name.
+          ```yaml
+          projects:
+            - name: default-path
+              git:
+                remotes:
+                  origin: https://github.com/example/default-path.git
+          ```
+
+      - question: Can `events` reference any command?
+        answer: >
+          Yes, but the commands must be defined elsewhere in the devfile with the matching IDs.
+
+          ```yaml
+          events:
+            postStart:
+              - start-backend
+          ```
+      - question: Are all fields in a project required?
+        answer: >
+          Only `name` and either `git` or `zip` are required.
+          ```yaml
+          projects:
+            - name: minimal
+              git:
+                remotes:
+                  origin: https://github.com/example/minimal.git
+          ```
+      - question: Can I use both `projects` and `starterProjects` in the same devfile?
+        answer: >
+          Yes, both can be used concurrently.
+          ```yaml
+          projects:
+            - name: core
+              git:
+                remotes:
+                  origin: https://github.com/example/core.git
+          starterProjects:
+            - name: frontend
+              git:
+                remotes:
+                  origin: https://github.com/example/frontend.git
+          ```
+  - context: >
+      The Devfile schema v2.3.0 defines the structure of a cloud-native devworkspace and development environment.
+      It supports inheritance from parent devfiles through a URI, an ID from a registry, or a Kubernetes resource of type DevWorkspaceTemplate.
+    questions_and_answers:
+      - question: What does the Devfile schema describe?
+        answer: The Devfile schema describes the structure of a cloud-native devworkspace and development environment used for defining container-based development setups.
+      - question: What is the purpose of the "parent" field in a Devfile?
+        answer: The "parent" field allows a devfile to inherit from another devworkspace template, which helps in reusing and extending existing configurations.
+      - question: What does the "id" property under "parent" represent?
+        answer: >
+          The "id" property represents the identifier of a parent devfile stored in a devfile registry.
+          ```yaml
+          parent:
+            id: nodejs
+          ```
+      - question: What is specified in the "kubernetes" property of the parent field?
+        answer: >
+          The "kubernetes" property refers to a Kubernetes Custom Resource of type DevWorkspaceTemplate, identified by a resource name and optionally a namespace.
+          ```yaml
+          parent:
+            kubernetes:
+              name: my-parent-template
+              namespace: devworkspace-templates
+          ```
+      - question: What does the "uri" property in the parent field indicate?
+        answer: >
+          The "uri" property provides a full or relative URI pointing to a YAML file for the parent devfile.
+          ```yaml
+          parent:
+            uri: https://example.com/devfiles/base-devfile.yaml
+          ```
+      - question: How can I reference a parent devfile using a registry ID?
+        answer: >
+          Use the `id` field under `parent` with the appropriate identifier for the devfile in the registry.
+          ```yaml
+          parent:
+            id: java-springboot
+          ```
+      - question: Can I use a Kubernetes resource as a parent devfile?
+        answer: >
+          Yes, you can use a Kubernetes DevWorkspaceTemplate resource by specifying its name under the `kubernetes` property.
+          ```yaml
+          parent:
+            kubernetes:
+              name: base-template
+          ```
+      - question: What is an example of a parent field using a URI?
+        answer: >
+          Here's how you use a URI to define the parent devfile:
+          ```yaml
+          parent:
+            uri: ./base-devfile.yaml
+          ```
+      - question: What does the "name" field in the "kubernetes" object signify?
+        answer: >
+          The "name" field specifies the name of the Kubernetes DevWorkspaceTemplate resource to reference.
+          ```yaml
+          parent:
+            kubernetes:
+              name: dev-environment-template
+          ```
+      - question: Is the "namespace" field required in the Kubernetes parent reference?
+        answer: >
+          No, it's optional. If omitted, the current namespace is assumed.
+          ```yaml
+          parent:
+            kubernetes:
+              name: common-template
+              namespace: workspace-templates
+          ```
+      - question: Can I define multiple parent sources in a devfile?
+        answer: No, the schema only allows one of `id`, `uri`, or `kubernetes` to be specified at a time in the `parent` field.
+      - question: What is the minimal required field for using a URI parent?
+        answer: >
+          The `uri` field is required if you're referencing a parent devfile by URI.
+          ```yaml
+          parent:
+            uri: https://example.com/devfile.yaml
+          ```
+      - question: What is the minimal required field for using an ID parent?
+        answer: >
+          The `id` field is required when using a devfile from a registry.
+          ```yaml
+          parent:
+            id: python
+          ```
+      - question: What is the minimal required field for using a Kubernetes resource as parent?
+        answer: >
+          The `name` field inside the `kubernetes` object is required.
+          ```yaml
+          parent:
+            kubernetes:
+              name: shared-template
+          ```
+      - question: Can a parent devfile contain other configurations?
+        answer: >
+          Yes, a parent devfile can contain components, commands, and projects which will be inherited by the child unless overridden.
+      - question: What is the use of inheriting from a parent devfile?
+        answer: Inheriting from a parent devfile allows reuse of standard configurations and promotes consistency across development environments.
+      - question: What file format is expected at the URI of a parent devfile?
+        answer: >
+          The URI should point to a valid YAML file conforming to the Devfile schema.
+          ```yaml
+          parent:
+            uri: https://raw.githubusercontent.com/myorg/devfiles/main/base.yaml
+          ```
+      - question: What is a valid example of using a parent devfile from registry with an ID?
+        answer: >
+          ```yaml
+          parent:
+            id: go
+          ```
+      - question: How do I reference a parent devfile from a GitHub-hosted raw YAML file?
+        answer: >
+          Provide the raw file link in the `uri` field.
+          ```yaml
+          parent:
+            uri: https://raw.githubusercontent.com/devfile-samples/devfile-stack/master/devfile.yaml
+          ```
+      - question: Can a parent devfile be used for extension?
+        answer: Yes, child devfiles can extend parent devfiles and override specific properties like components or commands.
+      - question: Can I override components from a parent devfile?
+        answer: Yes, the child devfile can override or extend components defined in the parent.
+      - question: Can a child devfile have additional components not in the parent?
+        answer: Yes, a child devfile can define its own components alongside inherited ones.
+      - question: What is a common use case for the Kubernetes parent reference?
+        answer: >
+          It's used in centralized enterprise environments to standardize dev environments via CRDs.
+          ```yaml
+          parent:
+            kubernetes:
+              name: enterprise-template
+              namespace: devops
+          ```
+      - question: How do I inherit from a relative parent devfile?
+        answer: Use a relative path in the `uri` field.
+          ```yaml
+          parent:
+            uri: ../base/devfile.yaml
+          ```
+      - question: Is it possible to chain multiple parent devfiles?
+        answer: No, the schema supports only a single parent reference.
+      - question: How do I inherit from a parent devfile that defines shared commands?
+        answer: >
+          Reference it through `parent`, and the commands will be inherited.
+          ```yaml
+          parent:
+            id: shared-commands
+          ```
+      - question: Can parent devfiles include variables?
+        answer: Yes, parent devfiles can define variables that child devfiles can reference using `{{variable-name}}`.
+      - question: Are components defined in a parent devfile mandatory in the child?
+        answer: No, the child devfile can selectively override or omit inherited components.
+      - question: How can I extend a devfile for a specific team by referencing a base parent?
+        answer: >
+          Define the team-specific additions in a child devfile and use `parent` to include the base.
+          ```yaml
+          parent:
+            uri: https://org.io/devfiles/base.yaml
+          ```
+      - question: Can parent devfiles define environment variables?
+        answer: Yes, and they can be inherited or overridden by the child devfile’s components.
+      - question: What happens if a field in the child devfile conflicts with the parent?
+        answer: The field in the child devfile overrides the one in the parent.                    
+document:
+  repo: https://github.com/tolusha/instructlab_knowledge.git
+  commit: ##REVISION##
+  patterns:
+    - devfile/04-devfile-schema.json

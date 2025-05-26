@@ -1,0 +1,290 @@
+created_by: Anatolii Bazko
+version: 3
+domain: devfile
+document_outline: General about devfile
+seed_examples:
+  - context: The concept of innerloop in the devfile specification refers to local development activities—such as building, running, testing, and debugging—performed before committing and pushing code to a remote repository. A devfile can be configured to support these workflows using components like the nodejs-18 UBI image. Key setup elements include defining a runtime container, specifying endpoints for access, and organizing commands by their function using the build, run, test, and debug command kinds. This structured approach enables efficient, iterative development within tools like odo, providing a smooth and consistent experience during the innerloop phase.
+    questions_and_answers:
+      - question: What is innerloop in the context of a devfile?
+        answer: >
+          Innerloop refers to the development actions performed within a developer's local environment, such as building, testing, debugging, and running the application before pushing the code to a repository. It allows developers to iterate quickly on their changes using tools like `odo`.
+      - question: How do you define a runtime container component for innerloop development?
+        answer: >
+          A runtime container component is defined using a `container` type with properties like `image`, `args`, `memoryLimit`, and `mountSources`:
+          ```yaml
+          components:
+            - name: runtime
+              container:
+                image: registry.access.redhat.com/ubi8/nodejs-18:latest
+                args: ['tail', '-f', '/dev/null']
+                memoryLimit: 1024Mi
+                mountSources: true
+          ```
+      - question: How are endpoints added for application and debugging access?
+        answer: >
+          Endpoints are defined under the container component's `endpoints` field to expose ports used by the application or debugger:
+          ```yaml
+          endpoints:
+            - name: http-node
+              targetPort: 3000
+            - exposure: none
+              name: debug
+              targetPort: 5858
+          ```
+      - question: How do you set environment variables in a container component?
+        answer: >
+          Environment variables are set using the `env` field under the container configuration:
+          ```yaml
+          env:
+            - name: DEBUG_PORT
+              value: '5858'
+          ```
+      - question: How do you define exec commands for build, run, test, and debug?
+        answer: >
+          Exec commands are defined under the `commands` section with details like `id`, `commandLine`, `component`, and `group` for categorization:
+          ```yaml
+          commands:
+            - id: install
+              exec:
+                component: runtime
+                commandLine: npm install
+                workingDir: ${PROJECT_SOURCE}
+                group:
+                  kind: build
+                  isDefault: true
+            - id: run
+              exec:
+                component: runtime
+                commandLine: npm start
+                workingDir: ${PROJECT_SOURCE}
+                group:
+                  kind: run
+                  isDefault: true
+          ```
+      - question: What is the purpose of the `group.kind` and `isDefault` fields?
+        answer: >
+          The `group.kind` field categorizes the command (e.g., build, run, test, debug), and `isDefault: true` sets the default command used by tools like `odo`:
+          ```yaml
+          group:
+            kind: build
+            isDefault: true
+          ```
+      - question: How does this devfile support tools like `odo dev`?
+        answer: The devfile includes all the necessary configurations (container, endpoints, commands) for a full development workflow, enabling `odo dev` to build and run the project interactively.
+      - question: What are best practices when creating a devfile for innerloop usage?
+        answer: >
+          Best practices include using a stable base image, exposing necessary ports, setting default build/run commands, and using `mountSources: true` for live code syncing.
+      - question: Can you explain how `mountSources` and `args` affect the container?
+        answer: >
+          `mountSources: true` mounts the project source code into the container. `args: ['tail', '-f', '/dev/null']` keeps the container running.
+          Example:
+          ```yaml
+          args: ['tail', '-f', '/dev/null']
+          mountSources: true
+          ```
+      - question: How would this innerloop devfile differ from an outerloop configuration?
+        answer: An innerloop devfile is optimized for real-time development and debugging with tools like `odo`, while an outerloop setup typically includes Kubernetes resources for deploying fully built applications in CI/CD or production environments.
+  - context: The outerloop in the Devfile specification refers to the post-development phase, focusing on building and deploying applications after code has been committed to a repository. To support this workflow, a devfile can define an image component that includes a Dockerfile and build context for container image creation. An apply command is used to initiate the image build. Deployment is handled by defining a component that leverages OpenShift templates, along with another apply command to execute the deployment. These steps can be combined into a composite command that encapsulates both the build and deploy actions, enabling a streamlined deploy workflow suitable for integration testing and full application rollout.
+    questions_and_answers:
+      - question: What is outerloop in a Devfile context?
+        answer: Outerloop refers to the deployment phase that occurs after the development is complete and code is committed to a source repository. It includes tasks like full builds, deployments, and integration testing. For example, you can define a Docker build and OpenShift deployment in your Devfile, allowing automation of post-commit deployment workflows.
+      - question: How do you define an image build in the outerloop?
+        answer: >
+          You define an image build by adding an `image` component to your Devfile that includes properties like `imageNameSelector`, `dockerfile` URI, build context, and whether root is required:
+          ```yaml
+          components:
+            - name: outerloop-build
+              image:
+                imageNameSelector: landingpage-image:latest
+                dockerfile:
+                  uri: docker/Dockerfile
+                  buildContext: .
+                  rootRequired: false
+          ```
+      - question: What is the role of `imageNameSelector` and how is it used?
+        answer: >
+          The `imageNameSelector` is used to label the Docker image being built, making it identifiable for further deployment or tagging. It helps tooling and automation pick the correct image:
+          ```yaml
+          imageNameSelector: landingpage-image:latest
+          ```
+      - question: How do you create a deployment component using an OpenShift template?
+        answer: >
+          You create a deployment component by adding an `openshift` type component in the Devfile with a `uri` property pointing to your OpenShift template file:
+          ```yaml
+          components:
+            - name: outerloop-deploy
+              openshift:
+                uri: landingpage-template.yaml
+          ```
+      - question: What are the differences between `apply` and `composite` commands?
+        answer: >
+          `apply` commands are used to trigger a single component operation, such as building an image or applying a deployment. `composite` commands combine multiple other commands to run them sequentially or in parallel. 
+          Example of an `apply` command:
+          ```yaml
+          - id: build-image
+            apply:
+              component: outerloop-build
+          ```
+          Example of a `composite` command:
+          ```yaml
+          - id: deploy
+            composite:
+              commands:
+                - build-image
+                - deploy-openshift
+              group:
+                kind: deploy
+                isDefault: true
+          ```
+      - question: Why is the `deploy` composite command marked as default?
+        answer: >
+          Marking the `deploy` composite command as default ensures it is automatically triggered during deployment workflows. This helps tools recognize it as the standard deployment action:
+          ```yaml
+          - id: deploy
+            composite:
+              commands:
+                - build-image
+                - deploy-openshift
+              group:
+                kind: deploy
+                isDefault: true
+          ```
+      - question: How are root privileges handled during the Docker build?
+        answer: >
+          Root privileges are controlled with the `rootRequired` flag under the `dockerfile` section in the `image` component. Setting it to `false` avoids using root access during the build:
+          ```yaml
+          dockerfile:
+            uri: docker/Dockerfile
+            buildContext: .
+            rootRequired: false
+          ```
+      - question: What is the purpose of combining build and deploy commands?
+        answer: >
+          Combining the build and deploy commands into a composite command simplifies execution, allowing a single command to perform both steps in sequence. This reduces manual effort and improves consistency:
+          ```yaml
+          - id: deploy
+            composite:
+              commands:
+                - build-image
+                - deploy-openshift
+              group:
+                kind: deploy
+                isDefault: true
+          ```
+      - question: Can the same pattern be used with Kubernetes instead of OpenShift?
+        answer: Yes, instead of an `openshift` component, you can define a `kubernetes` component with a `uri` pointing to your Kubernetes manifest
+  - context: Devfile support is integrated across various developer tools, each offering different levels of compatibility with innerloop and outerloop workflows. Tools like Odo (v2 and v3), Eclipse Che, JetBrains Space Cloud Dev, and OpenShift toolkits utilize devfiles to manage and deploy development environments. Odo v3 brings enhancements such as mandatory debug port specification and a shift toward persistent storage by default. JetBrains Space extends devfile capabilities with custom space-specific attributes to configure environments and supports partial outerloop functionality via the image component. Meanwhile, platforms like the OpenShift Dev Console and Amazon CodeCatalyst provide more limited or tailored devfile support, often depending on their alignment with earlier devfile specifications or their emphasis on deployment-centric use cases.
+    questions_and_answers:
+      - question: What is the difference between innerloop and outerloop deployments in devfile?
+        answer: Innerloop deployments refer to the local development lifecycle such as editing, building, running, and testing applications in a dev environment, while outerloop deployments focus on preparing applications for deployment, including building container images and deploying to a cluster.
+      - question: Which tools support both innerloop and outerloop deployments?
+        answer: The tools that support both innerloop and outerloop deployments are Odo v2, Odo v3, JetBrains Space Cloud Dev (only image build for outerloop), VSCode OpenShift Toolkit, and IntelliJ OpenShift Toolkit.
+      - question: What devfile features are supported by Odo v3?
+        answer: Odo v3 supports devfile 2.2.0 features with additional requirements like defining a debug port for debugging and defaulting to persistent volumes, which can be toggled to ephemeral volumes.
+      - question: How does Eclipse Che handle devfile deployment scopes?
+        answer: Eclipse Che supports only innerloop devfile features and is currently working on adding support for outerloop deployments.
+      - question: What is the devfile support level in Amazon CodeCatalyst?
+        answer: Amazon CodeCatalyst uses devfile specification 2.1.0 and therefore does not support outerloop deployments or newer devfile features introduced in later versions.
+      - question: What are the custom `space` attributes used in JetBrains Space Cloud Dev?
+        answer: JetBrains Space Cloud Dev uses a top-level `attributes.space` field to configure the environment, including instance type, IDE configuration, warmup scripts, and required parameters or secrets.
+      - question: How is image build configured in JetBrains Space?
+        answer: Image builds in JetBrains Space are configured using the `image` component, specifying properties like `imageName`, `dockerfile.uri`, `buildContext`, and build arguments; the built image is published to a project-specific registry.
+      - question: What devfile spec version is used by each tool?
+        answer: Odo v3 uses devfile 2.2.0, Amazon CodeCatalyst uses 2.1.0, JetBrains Space uses 2.2.0, and the article implies Eclipse Che and OpenShift Dev Spaces are aligned with recent 2.x versions, though exact versions aren't specified.
+      - question: How does OpenShift Dev Console utilize devfiles?
+        answer: OpenShift Dev Console supports only outerloop devfile deployments and is used primarily to deploy sample applications.
+      - question: What is the relationship between Eclipse Che and OpenShift Dev Spaces?
+        answer: Red Hat OpenShift Dev Spaces is the upstream of Eclipse Che and therefore provides the same level of devfile support, which currently includes only innerloop support.
+      - question: How do the OpenShift Toolkits for VSCode and IntelliJ use odo?
+        answer: Both OpenShift Toolkits use odo v3 to power core commands, thus inheriting the same devfile support features and limitations as odo v3.
+      - question: Where can I find additional devfile lifecycle event documentation for odo?
+        answer: Documentation for odo v2 lifecycle events is available at https://odo.dev/docs/2.5.0/tutorials/using-devfile-lifecycle-events and for odo v3 at https://odo.dev/docs/user-guides/advanced/using-devfile-lifecycle-events.
+  - context: Devfile specifications support inheritance through parent references, allowing a devfile to extend the configuration and behavior of another. This promotes reuse and modular design across development environments. A parent devfile can be referenced in three ways - using a registry id, a direct URI, or a Kubernetes resource. Child devfiles inherit components, commands, and other configurations from the parent, while retaining the flexibility to override or customize specific elements as needed. This mechanism streamlines environment management and encourages consistency across projects.
+    questions_and_answers:
+      - question: What is a parent devfile, and why would you use one?
+        answer: A parent devfile is a base configuration from which a child devfile inherits behavior and components. It allows reusing common development configurations across multiple devfiles. This improves maintainability and consistency. A child devfile can still override specific content from the parent, allowing for customization.
+      - question: How can a child devfile override content from a parent devfile?
+        answer: A child devfile can override specific sections such as components, commands, and metadata that are defined in the parent devfile. This is useful for adapting the base configuration to suit specific project requirements while still leveraging the shared base logic of the parent.
+      - question: What are the three ways to refer to a parent devfile?
+        answer: >
+          The three supported methods to refer to a parent devfile are:
+          1. Using a `registry id` from a Devfile registry.
+          2. Using a `uri` pointing to a remote devfile hosted on an HTTP server.
+          3. Using a `kubernetes` resource name and namespace.
+      - question: How do you refer to a parent devfile using a registry `id`?
+        answer: >
+          You can refer to a parent devfile published in a Devfile registry using its `id`, along with the `registryUrl` and optional `version`. If `version` is not specified, the default version is used:
+          ```yaml
+          schemaVersion: 2.2.0
+          metadata:
+            name: my-project-dev
+          parent:
+            id: nodejs
+            registryUrl: https://registry.devfile.io/
+            version: 2.0.0
+          ```
+      - question: How do you refer to a parent devfile using a `uri`?
+        answer: >
+          You can refer to a parent devfile hosted on a static HTTP server by providing the `uri`. This is useful for referencing devfiles stored on GitHub or similar:
+          ```yaml
+          schemaVersion: 2.2.0
+          metadata:
+            name: my-project-dev
+          parent:
+            uri: https://raw.githubusercontent.com/devfile/registry/main/stacks/nodejs/devfile.yaml
+          ```
+      - question: How do you refer to a parent devfile from a Kubernetes resource?
+        answer: >
+          You can refer to a parent devfile that is a Kubernetes Custom Resource of type `DevWorkspaceTemplate` by specifying its `name` and `namespace`:
+          ```yaml
+          schemaVersion: 2.2.0
+          metadata:
+            name: my-project-dev
+          parent:
+            kubernetes:
+              name: mydevworkspacetemplate
+              namespace: mynamespace
+          ```
+      - question: Can the version of the parent stack be omitted when using a registry `id`? What happens then?
+        answer: Yes, the `version` can be omitted when referring to a parent using a registry `id`. If omitted, the default version defined for the stack in the registry will be used.
+  - context: Devfile specifications allow developers to customize Kubernetes deployment behavior for container components using two override mechanisms - container-overrides and pod-overrides. The container-overrides attribute lets users adjust certain Kubernetes container spec fields, such as securityContext and resource limits, while restricting changes to essential fields like image, name, ports, and environment variables. Similarly, pod-overrides enables modifications to specific Kubernetes pod-level fields, including serviceAccountName, schedulerName, and pod-level securityContext, but excludes fields like containers, initContainers, and volumes. These overrides can be declared either at the component level or globally in the devfile, with global (devfile-level) overrides taking precedence. Both YAML and JSON formats are supported, and the overrides are applied using a strategic merge patch strategy to ensure controlled and predictable customization.
+    questions_and_answers:
+      - question: What is the purpose of `container-overrides` in a devfile?
+        answer: >
+          The `container-overrides` attribute in a devfile allows developers to override specific Kubernetes container spec fields, such as `securityContext` and `resources`, for a container component. It cannot be used to override properties like `image`, `name`, `ports`, `env`, `volumeMounts`, `command`, and `args`:
+          ```yaml
+          attributes:
+            container-overrides:
+              securityContext:
+                runAsUser: 1001
+                runAsGroup: 1001
+          ```
+      - question: What Kubernetes container properties cannot be overridden using `container-overrides`?
+        answer: >
+          The `container-overrides` attribute cannot override the following properties: `image`, `name`, `ports`, `env`, `volumeMounts`, `command`, and `args`.
+      - question: What is the purpose of `pod-overrides` in a devfile?
+        answer: >
+          The `pod-overrides` attribute in a devfile allows developers to override Kubernetes pod spec fields like `securityContext`, `serviceAccountName`, and `schedulerName`. It can be defined either at the component level or the devfile attribute level, and allows customization of pod behavior without altering core pod structure:
+          ```yaml
+          attributes:
+            pod-overrides:
+              spec:
+                serviceAccountName: new-service-account
+          ```
+      - question: Where can `pod-overrides` be defined and what is the order of precedence?
+        answer: `pod-overrides` can be defined at both the component level and the devfile's top-level attributes. If defined at both levels, the devfile-level `pod-overrides` is applied first, followed by the component-level using a strategic merge patch strategy.
+      - question: Can `container-overrides` and `pod-overrides` be specified in JSON format?
+        answer: >
+          Yes, both `container-overrides` and `pod-overrides` can be specified in JSON format:
+          ```yaml
+          attributes:
+            container-overrides:
+              securityContext: {"runAsUser": 1001, "runAsGroup": 1001}
+            pod-overrides:
+              spec: {"serviceAccountName": "new-service-account"}
+          ```         
+document:
+  repo: https://github.com/tolusha/instructlab_knowledge.git
+  commit: ##REVISION##
+  patterns:
+    - devfile/03-general.md

@@ -1,0 +1,6 @@
+title_of_work: Introduction into devfile ecosystem
+link_to_work: https://devfile.io/docs/
+revision: ##REVISION##
+license_of_the_work: CC-BY-SA-4.0
+creator_names: Open source contributors
+

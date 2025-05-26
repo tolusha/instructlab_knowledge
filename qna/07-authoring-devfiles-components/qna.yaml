@@ -1,0 +1,463 @@
+created_by: Anatolii Bazko
+version: 3
+domain: devfile
+document_outline: Authoring devfiles components
+seed_examples:
+  - context: Devfiles support the inclusion of kubernetes and openshift components to define custom deployment resources as part of the development environment. Each component must have a unique name and specify its type explicitly as either kubernetes or openshift. The resource itself can be provided using either a uri pointing to an external YAML/JSON file or an inlined definition directly within the devfile. These components can be configured to deploy automatically or be triggered via apply commands, enabling flexible deployment workflows tailored to different development and testing scenarios.
+    questions_and_answers:
+      - question: How do I add a `kubernetes` or `openshift` component to a devfile?
+        answer: >
+          To add a `kubernetes` or `openshift` component, define a component with either the `kubernetes` or `openshift` property, and use either the `uri` or `inlined` field to provide the resource content.
+          Example using `kubernetes` with `inlined`:
+          ```yaml
+          components:
+            - name: myk8deploy
+              kubernetes:
+                inlined:
+                  apiVersion: batch/v1
+                  kind: Job
+                  metadata:
+                    name: pi
+                  spec:
+                    template:
+                      spec:
+                        containers:
+                          - name: job
+                            image: myimage
+                            command: ["some", "command"]
+                        restartPolicy: Never
+          ```
+          Example using `openshift` with `uri`:
+          ```yaml
+          components:
+            - name: mysql
+              openshift:
+                uri: petclinic.yaml
+          ```
+      - question: What methods are available to specify the content of a `kubernetes` or `openshift` component?
+        answer: The content of a `kubernetes` or `openshift` component can be specified using either the `uri` or the `inlined` property. Use `uri` to refer to an external file and `inlined` to directly include the resource manifest.
+      - question: Are `kubernetes` or `openshift` components deployed by default?
+        answer: >
+          No, by default `kubernetes` and `openshift` components are not deployed automatically. To deploy them at startup, set `deployByDefault: true`:
+          ```yaml
+          components:
+            - name: mysql
+              openshift:
+                uri: petclinic.yaml
+              deployByDefault: true
+          ```
+      - question: How can I deploy a `kubernetes` or `openshift` component using a command?
+        answer: >
+          You can deploy a `kubernetes` or `openshift` component using an `apply` command with the group kind `deploy`:
+          ```yaml
+          commands:
+            - id: deploy-db
+              apply:
+                component: mysql
+                group:
+                  kind: deploy
+                  isDefault: true
+                label: "Deploy MySQL"
+          ```
+      - question: What if my `kubernetes` or `openshift` component uses an image built by an image component?
+        answer: >
+          In that case, create a `composite` command with `deploy` group kind to build the image and then deploy the component:
+          ```yaml
+          commands:
+            - id: build-image
+              apply:
+                component: myimage
+                group:
+                  kind: build
+                label: "Build image"
+            - id: deploy-k8s
+              apply:
+                component: myk8deploy
+                group:
+                  kind: deploy
+                label: "Deploy K8s component"
+            - id: full-deploy
+              composite:
+                commands:
+                  - build-image
+                  - deploy-k8s
+                group:
+                  kind: deploy
+                  isDefault: true
+                label: "Build and Deploy"
+                parallel: false
+          ```
+  - context: Devfiles allow the definition of container components to configure the runtime environment for development tasks. A container component specifies a custom container image and can be customized using fields such as mountSources to mount project files, command and args to override the default container entrypoint, and volumeMounts to attach shared storage. Endpoints can also be defined to expose network access to the container. Devfiles support both minimal container definitions and more advanced configurations, offering flexibility for tailoring the development workspace to specific application needs.
+    questions_and_answers:
+      - question: How do I add a container component in a devfile?
+        answer: >
+          To add a container component, define a component with the `container` type and specify properties like `image`, `command`, and `args`:
+          ```yaml
+          components:
+            - name: maven
+              container:
+                image: eclipse/maven-jdk8:latest
+                volumeMounts:
+                  - name: mavenrepo
+                    path: /root/.m2
+                env:
+                  - name: ENV_VAR
+                    value: value
+                endpoints:
+                  - name: maven-server
+                    targetPort: 3101
+                    protocol: https
+                    secure: 'true'
+                    exposure: public
+                memoryRequest: 256M
+                memoryLimit: 1536M
+                cpuRequest: 0.1
+                cpuLimit: 0.5
+                command: ['tail']
+                args: ['-f', '/dev/null']
+          ```
+      - question: How can I make a container component access project sources?
+        answer: >
+          Set `mountSources: true` in the container component. This mounts the project sources to the path defined by the `PROJECTS_ROOT` environment variable (default: `/projects`):
+          ```yaml
+          components:
+            - name: go
+              container:
+                image: golang
+                memoryLimit: 512Mi
+                mountSources: true
+                command: ['sleep', 'infinity']
+          ```
+      - question: How do I define and mount a volume in a container component?
+        answer: >
+          First, define a volume component. Then, reference it using `volumeMounts` in the container component:
+          ```yaml
+          components:
+            - name: mycontainer
+              container:
+                image: java11-maven:next
+                memoryLimit: 768Mi
+                mountSources: true
+                volumeMounts:
+                  - name: m2
+                    path: /home/user/.m2
+            - name: m2
+              volume:
+                size: 1Gi
+          ```
+      - question: How can I change the entrypoint command of a container?
+        answer: >
+          Use the `command` and optionally the `args` property in the `container` component to modify the container’s entrypoint:
+          ```yaml
+          components:
+            - name: go
+              container:
+                image: golang
+                memoryLimit: 512Mi
+                mountSources: true
+                command: ['sleep', 'infinity']
+          ```
+      - question: How can I expose a container’s port publicly over HTTPS?
+        answer: >
+          Use the `endpoints` property in the `container` component to expose a port. Set `protocol: https`, `secure: 'true'`, and `exposure: public`:
+          ```yaml
+          components:
+            - name: maven
+              container:
+                image: eclipse/maven-jdk8:latest
+                endpoints:
+                  - name: maven-server
+                    targetPort: 3101
+                    protocol: https
+                    secure: 'true'
+                    exposure: public
+          ```
+
+seed_examples:
+  - context: Devfiles support defining an image component to build container images as part of the development or deployment workflow. An image component is configured using a Dockerfile-based build and can source its content from a local URI, a Git repository, or a Devfile Registry entry. Key properties include imageName to specify the target image name, buildContext to set the directory for the Docker build context, args to pass build-time variables, and rootRequired to indicate whether elevated permissions are needed during the build. Multiple YAML examples illustrate how to configure each source type, enabling flexible image-building strategies directly within the devfile.
+    questions_and_answers:
+      - question: How can I define an image component in a devfile using a Dockerfile from the local project?
+        answer: >
+          You can define an image component by specifying the Dockerfile location using the `uri` property under `dockerfile`:
+          ```yaml
+          components:
+            - name: outerloop-build
+              image:
+                imageName: python-image:latest
+                autoBuild: true
+                dockerfile:
+                  uri: docker/Dockerfile
+                  args:
+                    - 'MY_ENV=/home/path'
+                  buildContext: .
+                  rootRequired: false
+          ```
+      - question: How do I specify an image component using a Dockerfile from a Git repository?
+        answer: >
+          To use a Git repository as the source for your Dockerfile, define the `git` property with `fileLocation`, `checkoutFrom`, and `remotes`:
+          ```yaml
+          components:
+            - name: outerloop-build
+              image:
+                imageName: python-image:latest
+                dockerfile:
+                  git:
+                    fileLocation: 'uri/Dockerfile'
+                    checkoutFrom:
+                      revision: 'main'
+                      remote: 'origin'
+                    remotes:
+                      'origin': 'https://github.com/myorg/myrepo'
+                  buildContext: .
+          ```
+      - question: How can I configure an image component using a Dockerfile from a devfile registry?
+        answer: >
+          You can use a Dockerfile from a devfile registry by specifying the `devfileRegistry` source with `id` and `registryUrl`:
+          ```yaml
+          components:
+            - name: outerloop-build
+              image:
+                imageName: python-image:latest
+                dockerfile:
+                  devfileRegistry:
+                    id: python
+                    registryUrl: myregistry.devfile.com
+                buildContext: .
+          ```
+      - question: What properties can be used under an image component's Dockerfile configuration?
+        answer: >
+          The Dockerfile configuration under an image component can include:
+          - `uri`: Path to the Dockerfile in the local context.
+          - `args`: Arguments passed during build.
+          - `buildContext`: Path used for build context.
+          - `rootRequired`: Boolean indicating if privileged build is needed.
+          - `git`: Git source with `fileLocation`, `remotes`, `checkoutFrom`.
+          - `devfileRegistry`: Devfile registry source with `id` and `registryUrl`.
+      - question: What does the `autoBuild` field do in an image component?
+        answer: >
+          The `autoBuild: true` setting tells the devfile system to automatically trigger a build of the image component when needed. This helps automate the outer loop development experience without manual intervention.
+      - question: When is the `rootRequired` property used in image builds?
+        answer: >
+          The `rootRequired` property is used when the Dockerfile build process needs privileged access, such as installing system packages or modifying the base image. Setting it to `true` ensures the build runs in a privileged builder pod.
+  - context: Devfiles support volume components to enable file sharing between container components within a workspace. A volume is defined as a standalone component and then mounted into one or more containers using volumeMounts. This allows containers to share data or cache build artifacts. Volumes can also be marked as ephemeral, ensuring that data does not persist across workspace restarts, which is useful for temporary or non-critical storage needs. By configuring volumes explicitly, devfiles provide flexible and reusable storage setups tailored to collaborative and containerized development environments.
+    questions_and_answers:
+      - question: What is the purpose of a volume component in a devfile?
+        answer: A volume component in a devfile is used to share files among container components, facilitating collaboration between development teams. It provides persistent or ephemeral storage depending on configuration.
+      - question: How do you define a volume and mount it in a container component?
+        answer: >
+          You define a volume by adding a component of type `volume` and specifying its size. Then you mount it in a container by referencing the volume name in `volumeMounts`:
+          ```yaml
+          schemaVersion: 2.2.0
+          metadata:
+            name: mydevfile
+          components:
+            - name: mydevfile
+              container:
+                image: golang
+                memoryLimit: 512Mi
+                mountSources: true
+                command: ['sleep', 'infinity']
+                volumeMounts:
+                  - name: cache
+                    path: /.cache
+            - name: cache
+              volume:
+                size: 2Gi
+          ```
+      - question: How can you make a volume ephemeral in a devfile?
+        answer: >
+          To make a volume ephemeral, set the `ephemeral: true` field in the `volume` definition. This ensures that the volume's data does not persist between container restarts:
+          ```yaml
+          schemaVersion: 2.2.0
+          metadata:
+            name: mydevfile
+          components:
+            - name: mydevfile
+              volume:
+                ephemeral: true
+                size: 200G
+          ```
+      - question: Can multiple container components share the same volume?
+        answer: Yes, volume components can be shared across multiple container components by mounting the same volume name in each container’s `volumeMounts` section.
+      - question: What is the required relationship between a volume name and its mount?
+        answer: The name used in the `volumeMounts` section of a container component must exactly match the name of a defined `volume` component to ensure proper mounting.
+      - question: Is it possible to define multiple volumes in a single devfile?
+        answer: Yes, you can define multiple volume components in a devfile, each with a unique name, and mount them into one or more containers as needed.
+  - context: Devfiles provide mechanisms to manage container resource usage and define environment-specific configuration through environment variables. Resource constraints can be set using properties such as memoryLimit, memoryRequest, cpuLimit, and cpuRequest within a container component, allowing developers to control how much memory and CPU a container can use or reserve. Additionally, environment variables can be defined using the env property, enabling the injection of configuration values directly into the container at runtime. These configurations help ensure that development environments remain efficient, predictable, and aligned with platform resource policies.
+    questions_and_answers:
+      - question: How do I set memory limits and requests for a container in a devfile?
+        answer: >
+          You can set memory limits using the `memoryLimit` property and requests using `memoryRequest` within the `container` component:
+          ```yaml
+          components:
+            - name: maven
+              container:
+                image: eclipse/maven-jdk8:latest
+                memoryLimit: 512M
+                memoryRequest: 256M
+          ```
+      - question: How do I define CPU limits and requests in a container component of a devfile?
+        answer: >
+          Use the `cpuLimit` and `cpuRequest` properties inside a `container` component to define CPU resources:
+          ```yaml
+          components:
+            - name: maven
+              container:
+                image: eclipse/maven-jdk8:latest
+                cpuLimit: 750m
+                cpuRequest: 450m
+          ```
+      - question: What happens if CPU or memory limits and requests are not specified in a devfile?
+        answer: If not specified, the resource limits and requests may be inferred by the application consuming the devfile or defaulted by the underlying platform, such as Kubernetes.
+      - question: How can I set environment variables in a container component of a devfile?
+        answer: >
+          You can set environment variables using the `env` property within the `container` component:
+          ```yaml
+          schemaVersion: 2.2.0
+          metadata:
+            name: mydevfile
+          components:
+            - name: go
+              container:
+                image: golang
+                memoryLimit: 512Mi
+                mountSources: true
+                command: ['sleep', 'infinity']
+                env:
+                  - name: gopath
+                    value: $(PROJECTS_ROOT)/go
+          ```
+      - question: Can I specify both resource limits and environment variables in the same container?
+        answer: >
+          Yes, you can define both resource limits (memory and CPU) and environment variables in the same `container` component:
+          ```yaml
+          components:
+            - name: node
+              container:
+                image: node:18
+                memoryLimit: 1024Mi
+                memoryRequest: 512Mi
+                cpuLimit: 1000m
+                cpuRequest: 500m
+                env:
+                  - name: NODE_ENV
+                    value: development
+          ```
+      - question: Are environment variables shared between containers if a devfile has multiple containers?
+        answer: No, environment variables defined in one container apply only to that specific container. Each container must define its own `env` list if needed.
+      - question: Can I use environment variable references like `$(PROJECTS_ROOT)` in devfile env values?
+        answer: >
+          Yes, you can reference predefined variables like `$(PROJECTS_ROOT)` in environment variable values within a container component:
+          ```yaml
+          env:
+            - name: GOPATH
+              value: $(PROJECTS_ROOT)/go
+          ```
+  - context: Devfiles support defining endpoints to enable access to services running inside development containers. Endpoints can be configured for container, kubernetes, and openshift component types, providing both internal and external connectivity options. Key properties include name to identify the endpoint, targetPort to specify the container port, and exposure to control visibility (internal, public, or none). Additional attributes like protocol (e.g., http, https), secure (for TLS encryption), and path (for routing) allow further customization. These configurations make it easy to expose applications, APIs, or development tools in a consistent and controlled manner across environments.
+    questions_and_answers:
+      - question: What is an endpoint in a devfile?
+        answer: >
+          An endpoint in a devfile exposes a port from a container, making it accessible either inside or outside the development workspace. It allows clients (e.g., browsers or tools) to communicate with services running in the container. Here's an example of a container component defining an endpoint:
+          ```yaml
+          components:
+            - name: go
+              container:
+                image: golang
+                memoryLimit: 512Mi
+                mountSources: true
+                command: ['sleep', 'infinity']
+                endpoints:
+                  - name: web
+                    targetPort: 8080
+                    exposure: public
+          ```
+      - question: What does the `exposure` property in an endpoint mean?
+        answer: >
+          The `exposure` property controls the accessibility of the endpoint. Setting it to `public` makes the endpoint accessible outside the workspace, typically via port 80 or 443 depending on TLS settings:
+          ```yaml
+          endpoints:
+            - name: web
+              targetPort: 8080
+              exposure: public
+          ```
+      - question: How do I define a secure endpoint in a devfile?
+        answer: >
+          You can secure an endpoint using the `secure: true` flag, which puts it behind a JWT proxy requiring a workspace token. This proxy assumes the service listens only on `127.0.0.1`:
+          ```yaml
+          endpoints:
+            - name: secure-service
+              targetPort: 9000
+              exposure: public
+              secure: true
+          ```
+      - question: What protocols can be used in a devfile endpoint?
+        answer: >
+          For public endpoints, you can use protocols like `http`, `https`, `ws`, or `wss`. These help the devfile consumer construct the correct access URL:
+          ```yaml
+          endpoints:
+            - name: api
+              targetPort: 8081
+              exposure: public
+              protocol: https
+          ```
+      - question: How can I define endpoints for a `kubernetes` or `openshift` component?
+        answer: >
+          Endpoints can also be defined for `kubernetes` or `openshift` components using the `endpoints` field under those components:
+          ```yaml
+          components:
+            - openshift:
+                name: webapp
+                uri: webapp.yaml
+                endpoints:
+                  - name: 'web'
+                    targetPort: 8080
+                    exposure: public
+            - kubernetes:
+                name: mongo
+                uri: mongo-db.yaml
+                endpoints:
+                  - name: 'mongo-db'
+                    targetPort: 27017
+                    exposure: public
+          ```
+  - context: Devfiles support embedding Kubernetes or OpenShift resource definitions to extend the development environment with additional services or infrastructure. These resources are included using kubernetes or openshift components, which can reference YAML manifests either through a uri or inline content. The resource definitions are merged into the overall workspace deployment, allowing seamless integration of tools, databases, or custom workloads. To avoid conflicts, it’s recommended to use unique resource names within the manifests. A common use case demonstrated is defining a PostgreSQL service using a kubernetes component that references an external YAML file via a uri path, enabling shared infrastructure directly within the devfile configuration.
+    questions_and_answers:
+      - question: How are Kubernetes or OpenShift resources integrated into a devfile?
+        answer: >
+          Kubernetes or OpenShift resources are integrated into a devfile using a component of type `kubernetes` or `openshift`. These components reference resource lists either from a file using the `uri` property or inline using the `inlined` property. All resources specified this way are merged into the single deployment created by the devfile:
+          ```yaml
+          components:
+            - name: mycomponent
+              kubernetes:
+                uri: ../relative/path/postgres.yaml
+          ```
+      - question: What is the behavior of Kubernetes resource lists within a devfile?
+        answer: Within a devfile, all Kubernetes or OpenShift resources are merged into a single deployment. This means multiple resources (like Deployment, Service, PVC) defined in a list are applied together under the devfile's single execution context.
+      - question: Are there any compatibility considerations when using Kubernetes vs OpenShift lists?
+        answer: Yes. When running a devfile on a Kubernetes cluster, only Kubernetes resource lists are supported. When running on OpenShift, both Kubernetes and OpenShift resource lists are supported.
+      - question: How should name conflicts be managed in Kubernetes resource definitions?
+        answer: Developers should avoid name conflicts when designing Kubernetes or OpenShift resource lists to be included in a devfile. Since all resources merge into a single deployment context, conflicting names could cause deployment failures or unexpected behavior.
+      - question: What does a full example of a devfile referencing a Kubernetes list look like?
+        answer: >
+          Below is a complete example of a devfile that references a Kubernetes YAML list containing PostgreSQL Deployment, Service, and PersistentVolumeClaim:
+          ```yaml
+          schemaVersion: 2.2.0
+          metadata:
+            name: mydevfile
+          projects:
+            - name: my-go-project
+              clonePath: go/src/github.com/acme/my-go-project
+              git:
+                remotes:
+                  origin: 'https://github.com/acme/my-go-project.git'
+          components:
+            - name: mycomponent
+              kubernetes:
+                uri: ../relative/path/postgres.yaml
+          ```
+
+document:
+  repo: https://github.com/tolusha/instructlab_knowledge.git
+  commit: ##REVISION##
+  patterns:
+    - devfile/05-authoring-devfiles-components.md

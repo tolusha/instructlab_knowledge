@@ -1,0 +1,134 @@
+created_by: Anatolii Bazko
+version: 3
+domain: devfile
+document_outline: Get started with devfile
+seed_examples:
+  - context: Odo is a command-line interface tool that streamlines the process of working with devfiles. It facilitates rapid development by allowing users to create components from devfile registries, push them to start development environments, and access running applications via generated URLs. Developers can easily make code changes and see them reflected in real time. The tool also provides commands to cleanly remove environments when they're no longer needed. Odo supports a straightforward installation and verification process, making it an efficient option for managing devfile-based workflows with minimal overhead.
+    questions_and_answers:
+      - question: What is `odo` and why is it used with devfiles?
+        answer: odo is a CLI tool that simplifies deploying and managing applications on Kubernetes or OpenShift using devfiles. It provides a fast and developer-friendly workflow by abstracting Kubernetes concepts and leveraging devfile-defined environments.
+      - question: How do you install `odo`?
+        answer: You can install odo by downloading the binary for your OS from the odo GitHub releases page (https://github.com/openshift/odo/releases), moving it to a directory in your PATH, and making it executable.
+      - question: How do you verify that `odo` is correctly installed?
+        answer: Run odo version in your terminal. If odo is installed correctly, it will print the version information.
+      - question: How do you create a component using a devfile from the registry?
+        answer: Use the command odo init, which interactively guides you to select a devfile from the devfile registry. You can also use flags like --name, --devfile, and --devfile-registry for non-interactive setup.
+      - question: How do you push and run the component?
+        answer: Run odo dev in your project directory. This launches the development environment, synchronizes your source code to the container, and starts your application.
+      - question: How can you access the running application?
+        answer: odo dev automatically exposes endpoints defined in the devfile and prints a local URL that you can open in your browser to access the application.
+      - question: How do you make and apply code changes?
+        answer: Make changes to the source files in your local directory. While odo dev is running, it detects changes and syncs them to the container automatically.
+      - question: How do you delete the development environment?
+        answer: To stop the development environment, press Ctrl+C. To delete the associated Kubernetes resources, run odo delete.
+      - question: How does `odo` interact with Kubernetes or OpenShift?
+        answer: odo reads the devfile and translates it into Kubernetes or OpenShift resources. It manages these resources behind the scenes, allowing developers to focus on coding.
+      - question: What are the key advantages of using `odo` with devfiles?
+        answer: odo and devfiles together provide a reproducible, fast, and easy-to-use development workflow. Developers can start coding quickly without deep Kubernetes knowledge.
+  - context: Eclipse Che is a platform designed for launching cloud-based developer environments using devfiles. It enables developers to either import Git repositories containing a .devfile.yaml or manually create and configure workspaces through a user interface. At the core of the system is the devfile, which defines key components such as containers, volumes, and commands needed to provision the environment. Che operates on Kubernetes to orchestrate these resources, ensuring consistency and scalability. It supports various language stacks like Java, Node.js, and Python, and allows for customization to match the specific needs of different projects.
+    questions_and_answers:
+      - question: What is Eclipse Che and how does it relate to devfiles?
+        answer: Eclipse Che is a cloud-based IDE and developer workspace server that uses devfiles to define and provision consistent, containerized development environments on Kubernetes.
+      - question: How can you create a workspace using a Git repository with a devfile?
+        answer: You can create a workspace by importing a Git repository that includes a `.devfile.yaml` file; Eclipse Che detects the devfile and automatically uses it to set up the development environment.
+      - question: What steps are involved in manually creating a devfile-based workspace in Che?
+        answer: You can manually create a workspace by navigating to the Che dashboard, selecting "Create Workspace," and either selecting a devfile stack from the registry or pasting in your custom devfile.
+      - question: How does Che use the devfile to provision environments?
+        answer: Che reads the devfile to determine what containers, commands, and resources (e.g., volumes) to set up and uses Kubernetes to orchestrate and launch the development environment accordingly.
+      - question: What are devfile stacks and how are they selected in Che?
+        answer: Devfile stacks are predefined configurations for different programming languages and frameworks; they can be selected from the devfile registry when creating a workspace in Che.
+      - question: Can you modify the devfile after a workspace is created?
+        answer: Yes, the devfile can be modified after workspace creation to customize the environment, such as changing the image or adding components and commands.
+      - question: What are some example use cases shown (e.g., Node.js, Java)?
+        answer: The article highlights Java (Quarkus), Node.js, and Python as example use cases, showing how devfiles for these stacks can be used to spin up complete development environments.
+      - question: How does the devfile simplify onboarding and consistency in Che?
+        answer: Devfiles automate environment setup, making onboarding faster and ensuring all developers work in a consistent, reproducible setup across different machines or teams.
+      - question: How is Kubernetes involved in workspace orchestration?
+        answer: Kubernetes is used by Che to schedule and manage the pods and containers defined in the devfile, enabling scalable and isolated development environments.
+      - question: What are the benefits of using devfiles in a Che environment?
+        answer: Using devfiles allows for automated, repeatable, and consistent development environments that are language-agnostic and fully integrated with cloud-native infrastructure like Kubernetes.
+  - context: A devfile is a YAML configuration file used to automate development environment setup. It can be integrated with local or cloud tools to streamline workflows. Supported by tools like `odo`, `Eclipse Che`, `Amazon CodeCatalyst`, and `JetBrains Space`, devfiles provide a standardized way to preconfigure tools, libraries, and runtime environments. Developers can use quickstart templates to spin up applications or full development workspaces quickly. Devfiles are especially useful in remote development setups and cloud-based IDEs to maintain consistency and reduce manual configuration.
+    questions_and_answers:
+      - question: What is a devfile and what is its purpose?
+        answer: A devfile is a YAML file that automates the configuration of development environments, simplifying and standardizing project setup processes across different tools and platforms.
+      - question: Which tools support devfiles?
+        answer: Tools that support devfiles include `odo`, `Eclipse Che`, `OpenShift Dev Console`, `VSCode OpenShift Toolkit`, `IntelliJ OpenShift Toolkit`, `Amazon CodeCatalyst`, and `JetBrains Space`.
+      - question: How can you use `odo` with a devfile to create a Node.js app?
+        answer: Using `odo` and the devfile specification, you can follow a quickstart guide to develop a Node.js “Hello World” application that demonstrates automated environment setup and simplified development processes.
+      - question: What is the role of devfiles in `Eclipse Che`?
+        answer: In `Eclipse Che`, devfiles are used to create customizable workspaces with community-backed samples, allowing developers to start coding in their preferred language with preconfigured tools.
+      - question: How does `Amazon CodeCatalyst` utilize devfiles?
+        answer: `Amazon CodeCatalyst` uses devfiles in its blueprints to define and pre-install required tools and libraries in a development environment for applications like a modern three-tier web app.
+      - question: How does `JetBrains Space` use devfiles for cloud development?
+        answer: `JetBrains Space` uses devfiles to configure remote development environments that are linked to Git repositories, enabling consistent and ready-to-use dev setups in the cloud.
+      - question: What are some benefits of using devfiles in remote or cloud environments?
+        answer: Devfiles offer pre-configured, consistent, and reproducible environments that reduce setup time and complexity, making them ideal for remote and cloud-based development.
+      - question: How do devfiles help standardize development setups across different IDEs and platforms?
+        answer: By defining tools, runtimes, and dependencies in a common format, devfiles ensure consistency across IDEs and platforms, enabling uniform developer experiences regardless of the environment.
+  - context: Devfile support can be integrated into code editors through the YAML Language Server, which enhances the developer experience by providing validation, IntelliSense, formatting, and hover documentation for YAML files. This functionality relies on fetching schemas from the JSON Schema Store, where the devfile schema is actively maintained. In editors like VSCode, developers can enable these features by installing the Red Hat YAML Plugin. To activate devfile-specific IntelliSense, users need to reference the appropriate schema in their editor’s settings, allowing for smarter editing and easier authoring of devfiles.
+    questions_and_answers:
+      - question: What is the role of the YAML Language Server in devfile integration?
+        answer: The YAML Language Server provides features like validation, document outlining, auto-completion, hover support, and formatting for YAML files, enabling devfile support by using JSON schemas.
+      - question: How can VSCode users enable devfile support?
+        answer: VSCode users can enable devfile support by installing the YAML VSCode Plugin from the Marketplace, which is built and maintained by Red Hat.
+      - question: Where does the YAML Language Server obtain the devfile schema?
+        answer: It obtains the devfile schema from the JSON Schema Store, where the devfile team maintains the schema.
+      - question: What settings need to be added to VSCode for devfile IntelliSense?
+        answer: Users need to add a reference to the devfile schema in their VSCode settings using this snippet:
+          ```json
+          "yaml.schemas": {
+            "https://raw.githubusercontent.com/devfile/api/main/schemas/latest/devfile.json": "devfile.yaml"
+          }
+          ```
+      - question: Are there plugins for editors other than VSCode to support devfile integration?
+        answer: Yes, other editor plugins that support the YAML Language Server can be found in its GitHub repository.
+seed_examples:
+  - context: Devfile validation rules are designed to ensure that configurations are well-structured and align with Kubernetes standards. These rules enforce naming conventions for fields like id and name, which must use lowercase alphanumeric characters with optional dashes and be no longer than 63 characters. At the component level, names must be unique, and containers must be properly configured with valid volume mounts and environment variables. Commands require unique IDs and must follow type-specific rules for exec, apply, and composite commands. Endpoint ports need to be uniquely defined across container components unless dedicated pods are used. Additional validation covers events, plugin components, image definitions, and project configurations to maintain overall schema consistency and integrity.
+    questions_and_answers:
+      - question: What is the regex pattern used to validate `id` and `name` fields in a Devfile?
+        answer: The regex pattern is `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$`.
+
+      - question: What are the character and format restrictions for `id` and `name` fields?
+        answer: The fields must be lowercase, no special characters except dash(-), must start and end with an alphanumeric character, and be limited to 63 characters.
+
+      - question: Can two container components have the same `targetPort` in their endpoints?
+        answer: No, unless the container components have `dedicatedPod` set to `true`, container components must have unique `targetPort` values.
+      - question: Can a `composite` command reference itself?
+        answer: No, a `composite` command cannot reference itself directly or indirectly through its subcommands.
+      - question: What kind of components can an `apply` command target?
+        answer: An `apply` command can target `container`, `kubernetes`, `openshift`, or `image` components.
+      - question: What is the requirement for command `id` fields?
+        answer: Command `id` fields must be unique across the Devfile.
+      - question: How many default commands can exist for each command group kind?
+        answer: Only one default command is allowed per group kind (build, run, test, debug, deploy); otherwise, a warning will be issued.
+      - question: What must be true for volume mounts in container components?
+        answer: Volume mounts in container components must reference valid and uniquely named volume components.
+      - question: Can reserved environment variables like `PROJECT_SOURCE` be redefined in container `env`?
+        answer: No, reserved environment variables such as `PROJECT_SOURCE` and `PROJECTS_ROOT` cannot be redefined.
+      - question: What format must resource requests and limits follow?
+        answer: They must be in a valid Kubernetes quantity format, and the requested resource must be less than the corresponding limit.
+      - question: What rule applies to annotation conflicts in container components?
+        answer: Annotations must not have conflicting values for the same key, except for deployment and service annotations in containers with `dedicatedPod=true`.
+      - question: What validation applies to the `uri` property in Kubernetes and OpenShift components?
+        answer: The `uri` must be in a valid URI format.
+      - question: What restriction applies to image components with a git source?
+        answer: Image components using git can only have one remote, and if `checkoutFrom.remote` is specified, it must exist in the remotes map.
+      - question: What types of commands can be used in `preStart` and `postStop` events?
+        answer: Only `apply` commands are allowed in `preStart` and `postStop` events.
+      - question: What types of commands can be used in `postStart` and `preStop` events?
+        answer: Only `exec` commands are allowed in `postStart` and `preStop` events.
+      - question: Can a `composite` command be used in events?
+        answer: Yes, but for `preStart` and `postStop`, all subcommands must be `apply` commands; for `postStart` and `preStop`, all subcommands must be `exec` commands.
+      - question: What validation rule applies to plugin component registries?
+        answer: Plugin component registry URLs must be in a valid format.
+      - question: Can a starter project have multiple remotes?
+        answer: No, a starter project entry cannot have more than one remote defined.
+      - question: What must be validated if a `checkoutFrom.remote` is mentioned in a project?
+        answer: It must be validated against the defined remotes map, and is mandatory if more than one remote is configured.
+      - question: Do parent Devfiles follow the same validation rules?
+        answer: Yes, all validation rules apply to parent Devfiles after merging and flattening.
+document:
+  repo: https://github.com/tolusha/instructlab_knowledge.git
+  commit: ##REVISION##
+  patterns:
+    - devfile/02-get-started.md

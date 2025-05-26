@@ -1,1 +1,1 @@
-# instructlab_knowledge
+# Devfile instructlab knowledge

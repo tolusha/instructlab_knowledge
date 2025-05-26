@@ -1,0 +1,291 @@
+created_by: Anatolii Bazko
+version: 3
+domain: devfile
+document_outline: Authoring devfiles
+seed_examples:
+  - context: >
+      A minimal devfile can be created by specifying just the essential fields: schemaVersion and metadata.name. The schemaVersion attribute is mandatory to indicate which version of the Devfile specification is being used, while metadata.name provides a static identifier for the workspace. This minimal setup serves as a foundation for further configuration and ensures the devfile is valid and recognizable by supported tools.
+    questions_and_answers:
+      - question: What is the minimal requirement to define a valid devfile?
+        answer: >
+          The minimal requirement to define a valid devfile includes specifying the `schemaVersion` and the `metadata.name` attributes.
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: devfile-sample
+          ```
+      - question: Can I include a version in the metadata of a minimal devfile?
+        answer: >
+          Yes, you can include a `version` field in the `metadata` section to specify the version of the devfile.
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: devfile-sample
+            version: 0.0.1
+          ```
+      - question: Is the `schemaVersion` attribute optional in a devfile?
+        answer: No, the `schemaVersion` attribute is mandatory and must be defined in every devfile to ensure compatibility and validation.
+      - question: What does the `metadata.name` attribute represent in a devfile?
+        answer: The `metadata.name` attribute specifies a static name for the workspace, which helps identify the devfile uniquely.
+      - question: Can additional metadata fields be added to a minimal devfile?
+        answer: >
+          Yes, besides `name`, additional metadata fields like `version`, `description`, or `tags` can be added as needed, though they are not required in a minimal devfile.
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: devfile-sample
+            version: 0.0.1
+            description: Minimal devfile example
+            tags:
+              - example
+              - minimal
+          ```
+  - context: Devfiles can be authored from scratch or structured as reusable templates to streamline environment setup. Starting with a minimal configuration, a devfile can be extended to define a full web service stack by including metadata, components, commands, and starter projects. The specification supports adding environment variables and exposing container endpoints to enable service accessibility. A complete example illustrates how to assemble these elements into a functional Go-based web service template, demonstrating how devfiles can encapsulate both development logic and runtime behavior.
+    questions_and_answers:
+      - question: What is the minimal required structure of a devfile?
+        answer: >
+          A minimal devfile only requires the `schemaVersion` field. Adding metadata is optional but recommended.
+          ```yaml
+          schemaVersion: 2.3.0
+          ```
+          Minimal devfile with metadata:
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: devfile-sample
+            version: 2.0.0
+          ```
+      - question: What metadata fields are recommended when creating a web service devfile template?
+        answer: >
+          Recommended metadata fields include `name`, `version`, `description`, `projectType`, `language`, 
+          `provider`, `tags`, `architectures`, `displayName`, and `icon`.
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: web-service
+            version: 1.0.0
+            description: A web service template.
+            projectType: Go
+            language: Go
+            provider: Red Hat
+            tags: [ 'Go', 'Gin', 'pq' ]
+            architectures: [ 'amd64' ]
+            displayName: Simple Web Service
+            icon: https://raw.githubusercontent.com/devfile-samples/devfile-stack-icons/main/golang.svg
+          ```
+      - question: How do you define a container component in a devfile for a web service?
+        answer: >
+          A container component should include a `name`, `image`, and optionally `endpoints` and `env` variables.
+          ```yaml
+          components:
+            - name: web
+              container:
+                image: quay.io/devfile/golang:latest
+                endpoints:
+                  - name: http
+                    targetPort: 8080
+                env:
+                  DATABASE_HOST: db.example.com
+                  DATABASE_PORT: 5432
+                  DATABASE_NAME: dev
+                  DATABASE_USER: devuser
+                  DATABASE_PASSWORD: devpassword
+          ```
+      - question: How do you define commands to build and run the project in the devfile?
+        answer: >
+          Commands should have an `id`, and use the `exec` type with a `commandLine`, `component`, and `workingDir`. 
+          Grouping commands with `build` or `run` kinds is recommended.
+          ```yaml
+          commands:
+            - id: build
+              exec:
+                commandLine: go build main.go
+                component: web
+                workingDir: ${PROJECT_SOURCE}
+                group:
+                  kind: build
+                  isDefault: true
+            - id: run
+              exec:
+                commandLine: ./main
+                component: web
+                workingDir: ${PROJECT_SOURCE}
+                group:
+                  kind: run
+                  isDefault: true
+          ```
+      - question: How do you define a starter project in a devfile?
+        answer: >
+          A starter project can be defined using `starterProjects` with a `name`, optional `description`, and a git `remotes` section.
+          ```yaml
+          starterProjects:
+            - name: web-starter
+              description: A web service starting point.
+              git:
+                remotes:
+                  origin: https://github.com/devfile-samples/devfile-stack-go.git
+          ```
+      - question: What does a complete web service devfile template look like?
+        answer: >
+          A complete devfile includes metadata, components, commands, and a starter project.
+          ```yaml
+          schemaVersion: 2.3.0
+          metadata:
+            name: web-service
+            version: 1.0.0
+            description: A web service template.
+            projectType: Go
+            language: Go
+            provider: Red Hat
+            tags: [ 'Go', 'Gin', 'pq' ]
+            architectures: [ 'amd64' ]
+            displayName: Simple Web Service
+            icon: https://raw.githubusercontent.com/devfile-samples/devfile-stack-icons/main/golang.svg
+          components:
+            - name: web
+              container:
+                image: quay.io/devfile/golang:latest
+                endpoints:
+                  - name: http
+                    targetPort: 8080
+                env:
+                  DATABASE_HOST: db.example.com
+                  DATABASE_PORT: 5432
+                  DATABASE_NAME: dev
+                  DATABASE_USER: devuser
+                  DATABASE_PASSWORD: devpassword
+          commands:
+            - id: build
+              exec:
+                commandLine: go build main.go
+                component: web
+                workingDir: ${PROJECT_SOURCE}
+                group:
+                  kind: build
+                  isDefault: true
+            - id: run
+              exec:
+                commandLine: ./main
+                component: web
+                workingDir: ${PROJECT_SOURCE}
+                group:
+                  kind: run
+                  isDefault: true
+          starterProjects:
+            - name: web-starter
+              description: A web service starting point.
+              git:
+                remotes:
+                  origin: https://github.com/devfile-samples/devfile-stack-go.git
+          ```
+  - context: Devfiles support the use of variables for string substitution, allowing dynamic and reusable configurations. Variables can be defined at the top level of a devfile or within a parent devfile and are referenced using the {{variable-name}} syntax. While powerful, their usage is limited in certain fields such as schemaVersion, metadata, identifiers, and enumerated values, where substitutions are not permitted. If a referenced variable is undefined, it triggers a non-blocking warning rather than an error, helping maintain flexibility during development without interrupting devfile processing.
+    questions_and_answers:
+      - question: What is the purpose of the `variables` object in a devfile?
+        answer: The `variables` object allows you to define name-value pairs that can be referenced in the devfile using `{{variable-name}}` syntax for string substitution. This enables better reuse and easier configuration updates.
+      - question: Where can variables be defined in a devfile?
+        answer: Variables can be defined at the top level of the devfile or inside a `parent` object. These definitions are then used for string substitution throughout the devfile.
+      - question: What is the correct syntax to reference a variable in a devfile?
+        answer: >
+          Variables are referenced using the `{{variable-name}}` syntax. For example, if you define `javaVersion: 11`, you can reference it in an image like `quay.io/eclipse/che-java{{javaVersion}}-maven:nightly`.
+      - question: What are the restrictions on using variables in a devfile?
+        answer: >
+          Variables cannot be used in the following areas:
+          - `schemaVersion`, `metadata`, or `parent` source
+          - Element identifiers like `command.id`, `component.name`, `endpoint.name`, and `project.name`
+          - References to identifiers (e.g., binding command by name)
+          - Enumerated values like `group.kind` or `endpoint.exposure`
+      - question: What happens if you reference a variable that has not been defined?
+        answer: If a variable is referenced but not defined, the devfile processor issues a non-blocking warning. The devfile can still run.
+      - question: Can you show an example of defining and using a variable in a devfile?
+        answer: >
+          ```yaml
+          schemaVersion: 2.2.0
+          metadata:
+            name: java-maven
+            version: 1.1.1
+          variables:
+            javaVersion: 11
+          components:
+            - name: tools
+              container:
+                image: quay.io/eclipse/che-java{{javaVersion}}-maven:nightly
+          ```
+      - question: Can you use a variable in the `component.name` or `command.id`?
+        answer: No, variables cannot be used in identifiers such as `component.name`, `command.id`, `endpoint.name`, or `project.name`.
+      - question: Can variables be used inside command groups or endpoint exposure fields?
+        answer: No, string enumerations such as `command.group.kind` or `endpoint.exposure` do not support variable substitution.
+  - context: Devfiles support customizable attributes that allow developers to extend and tailor the behavior of various components. These attributes are defined using free-form YAML and can be placed at the top level of the devfile or within specific sections such as components, commands, and projects. While attributes were previously allowed in the metadata section, this usage is now deprecated in favor of top-level placement. Procedural examples demonstrate how attributes can be applied to components or across the entire devfile, enabling tool-specific configurations and enhanced flexibility without altering the core schema.
+    questions_and_answers:
+      - question: Where can devfile attributes be defined?
+        answer: Attributes can be defined at the top level of the devfile or within `components`, `commands`, `projects`, `starterProjects`, and `endpoints`. Note that defining attributes in `metadata` is deprecated.
+      - question: How are attributes defined within a component?
+        answer: >
+          Attributes in a component are defined under the `attributes` key inside the component. These can configure resource specifications like CPU, memory, and port settings. Here's an example:
+          ```yaml
+          schemaVersion: 2.2.0
+          metadata:
+            name: java-quarkus
+          components:
+            - name: outerloop-deploy
+              attributes:
+                deployment/replicas: 1
+                deployment/cpuLimit: "100m"
+                deployment/cpuRequest: 10m
+                deployment/memoryLimit: 250Mi
+                deployment/memoryRequest: 100Mi
+                deployment/container-port: 8081
+              kubernetes:
+                uri: outerloop-deploy.yaml
+          ```
+      - question: How can a custom attribute be defined at the devfile level?
+        answer: >
+          A custom attribute at the devfile level is defined under the `attributes` section at the top of the devfile. This allows global custom configuration. Example:
+          ```yaml
+          schemaVersion: 2.2.0
+          attributes:
+            editorFree: true
+          metadata:
+            name: petclinic-dev-environment
+          components:
+            - name: myapp
+              kubernetes:
+                uri: my-app.yaml
+          ```
+      - question: Are attributes in the metadata section still supported?
+        answer: Attributes in the `metadata` section are deprecated and should no longer be used. Developers should define attributes either at the top level of the devfile or within the supported objects like `components`, `commands`, etc.
+      - question: What is the purpose of devfile attributes?
+        answer: Devfile attributes allow developers to define custom configuration options that tools and platforms can use to control behavior, deployment settings, and feature toggles. They provide flexibility for implementation-specific needs in a structured, yet extensible way.
+  - context: Devfiles can be created and packaged to define complete development environments, starting either from scratch or by leveraging entries from the public devfile registry. When preparing a devfile, it’s important to include all necessary outerloop resources—such as Dockerfiles and Kubernetes deployment manifests—to support full build and deployment workflows. For registry-based devfiles, supporting files are typically stored in the associated GitHub source directory, where developers can retrieve required assets to complete their environment setup. This approach ensures devfiles are portable, self-contained, and ready for integration with development tools and platforms.
+    questions_and_answers:
+      - question: How can I create a devfile?
+        answer: You can create a devfile by either starting from scratch using the [create-devfiles guide](https://devfile.io/docs/2.3.0/create-devfiles) or by selecting a predefined stack from the [public community devfile registry](https://registry.devfile.io/viewer). Once created, the devfile should be saved as `.devfile.yaml` in the root directory of your application.
+      - question: What outerloop resources should be included with a devfile?
+        answer: >
+          If the devfile includes outerloop features such as building or deploying the application, you must include the necessary files in the expected paths. For example, if using an image component with a Dockerfile, ensure the Dockerfile exists at the path defined in the devfile.
+          ```yaml
+          components:
+            - name: outerloop-build
+              image:
+                imageName: image:latest
+                dockerfile:
+                  uri: docker/Dockerfile
+          ```
+          Similarly, for Kubernetes deployment components, the YAML manifest must be present at the specified URI:
+          ```yaml
+          components:
+            - name: outerloop-deploy
+              kubernetes:
+                uri: kubernetes/deploy.yaml
+          ```
+      - question: Where can I find the supporting files if I use a devfile from the public registry?
+        answer: If you are using a devfile from the public community registry, the necessary supporting files like Dockerfiles or deployment YAMLs can be found in the [Devfile registry GitHub source directory](https://github.com/devfile/registry/tree/main/stacks). Ensure you copy these files into your project at the appropriate paths referenced in the devfile.
+      - question: How many questions are needed to fully cover the document content?
+        answer: >
+          Four questions are sufficient to fully cover the content of the document: one for how to create a devfile, one for outerloop resources, one for locating supporting files, and one summarizing the number of questions required.
+      - question: What is the correct file name and location for the devfile?
+        answer: The devfile should be saved with the name `.devfile.yaml` and placed in the root directory of your application. This ensures proper detection and usage by tools that rely on the devfile format.         
+document:
+  repo: https://github.com/tolusha/instructlab_knowledge.git
+  commit: ##REVISION##
+  patterns:
+    - devfile/05-authoring-devfiles.md

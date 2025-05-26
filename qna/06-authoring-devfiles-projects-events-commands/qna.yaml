@@ -1,0 +1,376 @@
+created_by: Anatolii Bazko
+version: 3
+domain: devfile
+document_outline: Authoring devfiles projects, events and commands
+seed_examples:
+  - context: Devfiles support adding one or more projects to define the source code repositories used within the development environment. Each project entry must have a unique name and can optionally include a clonePath to specify its target directory under /projects/. Projects can be sourced either from git repositories or ZIP archives. For git sources, a remotes field is required and may include an optional checkoutFrom field to specify the branch or revision to clone. For zip sources, a location field must be provided with a direct URL to the archive. This flexible structure allows developers to preload workspaces with the appropriate project code.
+    questions_and_answers:
+      - question: How do you define a project using a Git source in a devfile?
+        answer: >
+          To define a project using a Git source, use the `projects` field and include the `git` object with a required `remotes` field and an optional `checkoutFrom` field. Here’s an example:
+          ```yaml
+          projects:
+            - name: petclinic
+              git:
+                remotes:
+                  origin: 'https://github.com/spring-projects/spring-petclinic.git'
+                checkoutFrom:
+                  revision: main
+          ```
+      - question: How do you define a project using a ZIP archive in a devfile?
+        answer: >
+          To define a project using a ZIP archive, use the `zip` object under the project with the `location` key pointing to the ZIP file URL. Example:
+          ```yaml
+          projects:
+            - name: my-zip-project
+              zip:
+                location: http://host.net/path/project-src.zip
+          ```
+      - question: What is the `clonePath` attribute and how is it used in a devfile project?
+        answer: >
+          The `clonePath` attribute specifies the relative path under `/projects/` where the project should be cloned. If omitted, the project is cloned into a directory matching the project `name`. Example:
+          ```yaml
+          projects:
+            - name: my-project-resource
+              clonePath: resources/my-project
+              zip:
+                location: http://host.net/path/project-res.zip
+          ```
+      - question: Can you add multiple projects in one devfile? How?
+        answer: >
+          Yes, you can include multiple projects in one devfile by listing them under the `projects` field. Each project should have a unique `name` and use either a `git` or `zip` source. Example:
+          ```yaml
+          projects:
+            - name: frontend
+              git:
+                remotes:
+                  origin: 'https://github.com/acmecorp/frontend.git'
+            - name: backend
+              git:
+                remotes:
+                  origin: 'https://github.com/acmecorp/backend.git'
+          ```
+      - question: What fields are required for a Git-based project in a devfile?
+        answer: >
+          For a Git-based project, the `name` field is required at the top level, and under the `git` object, the `remotes` field is required. The `checkoutFrom` field is optional. Example:
+          ```yaml
+          projects:
+            - name: sample-app
+              git:
+                remotes:
+                  origin: 'https://github.com/sample-org/sample-app.git'
+          ```
+      - question: What fields are required for a ZIP-based project in a devfile?
+        answer: >
+          For a ZIP-based project, the `name` field is required, and under the `zip` object, the `location` field is needed. Example:
+          ```yaml
+          projects:
+            - name: zip-example
+              zip:
+                location: http://host.net/sample.zip
+          ```
+      - question: What schema version supports the addition of projects in a devfile?
+        answer: >
+          The examples in the article use `schemaVersion: 2.2.0`, which supports adding projects. Example:
+          ```yaml
+          schemaVersion: 2.2.0
+          metadata:
+            name: example-devfile
+          projects:
+            - name: backend
+              git:
+                remotes:
+                  origin: 'https://github.com/acmecorp/backend.git'
+          ```
+      - question: Can `checkoutFrom` be used without specifying a revision in a Git project?
+        answer: No, `checkoutFrom` should include a `revision` field that indicates the branch or tag to check out. If you omit it, the default branch will be used only if `checkoutFrom` is omitted entirely.
+      - question: Is it possible to leave the `/projects/` directory using `clonePath`?
+        answer: No, `clonePath` must remain within the `/projects/` directory. It cannot traverse outside that directory for security and sandboxing purposes.
+  - context: Starter projects in a devfile offer ready-to-use scaffolding to help developers quickly initialize their environments with example or template code. Each starter project requires a unique name and must specify either a git or zip source. Git-based starters can define a remote repository, with optional fields for a specific revision and subdirectory to serve as the project root. If the starter project includes its own devfile, it will override the original devfile used to fetch the starter, allowing the environment to adapt to the starter’s specific configuration. This feature supports flexible, turnkey onboarding experiences for various tech stacks.
+    questions_and_answers:
+      - question: What is the purpose of starter projects in a devfile?
+        answer: Starter projects allow users to bootstrap their development environments with a predefined source code setup, which is particularly helpful when using tools like `odo init`.
+      - question: What are the required fields for a starter project?
+        answer: A starter project must include a `name` and either a `git` or `zip` object to define the source location.
+      - question: Can you provide an example of a devfile with both git and zip starter projects?
+        answer: >
+          ```yaml
+          schemaVersion: 2.2.0
+          starterProjects:
+            - name: nodejs-starter
+              git:
+                remotes:
+                  origin: https://github.com/odo-devfiles/nodejs-ex.git
+            - name: nodejs-zip-starter
+              zip:
+                location: https://github.com/odo-devfiles/nodejs-ex/archive/refs/tags/0.0.2.zip
+          ```
+      - question: Is it possible to have multiple git starter projects in a devfile?
+        answer: >
+          Yes, you can define multiple git starter projects. Each project must have a unique `name` and a single `origin` remote:  
+          ```yaml
+          schemaVersion: 2.2.0
+          metadata:
+            name: example-devfile
+            version: 1.0.0
+          starterProjects:
+            - name: frontend
+              git:
+                remotes:
+                  origin: 'https://github.com/acmecorp/frontend.git'
+            - name: backend
+              git:
+                remotes:
+                  origin: 'https://github.com/acmecorp/backend.git'
+          ```
+      - question: How do you specify a branch, tag, or commit for a git-based starter project?
+        answer: > 
+          You can use the `checkoutFrom.revision` field under the git object to specify a branch, tag, or commit:
+          ```yaml
+          schemaVersion: 2.2.0
+          starterProjects:
+            - name: demo-starter
+              git:
+                remotes:
+                  origin: <git-repo>
+                checkoutFrom:
+                  revision: 1.1.0Final
+                subDir: demo
+          ```
+      - question: What happens if the starter project includes a devfile?
+        answer: If a devfile is present in the starter project source, that devfile will be used for the environment setup instead of the original devfile used to fetch the starter.
+      - question: What is the role of `subDir` in a git-based starter project?
+        answer: The `subDir` field allows specifying a subdirectory from the source location to be treated as the root directory for the starter project. The default is `.` if not provided.
+      - question: Can a starter project specify multiple git remotes?
+        answer: No, only a single git remote (typically `origin`) can be specified for each git-based starter project.
+      - question: What is the default behavior if no revision is provided in a git-based starter project?
+        answer: If `checkoutFrom.revision` is not provided, the default branch of the repository will be used.
+      - question: Can a zip-based starter project also include a subdirectory?
+        answer: No, the `subDir` field is only applicable to git-based starter projects, not zip-based ones.
+      - question: What schema version introduced starter projects and what version is used in the examples?
+        answer: Starter projects are supported in schema version `2.2.0`, which is the version used in the provided examples.
+  - context: Devfiles support defining structured commands to automate development workflows, using three main types: exec, apply, and composite. Exec commands are used to run specific actions within a container, such as compiling code or starting a development server. Apply commands trigger configuration or deployment actions, like applying Kubernetes manifests. Composite commands allow multiple commands to be executed sequentially or in parallel, enabling complex workflows. Each command can be grouped by function—such as build, run, test, debug, or deploy—to clarify its role and enable tool integration. This structured approach streamlines development processes within devfile-based environments.
+    questions_and_answers:
+      - question: How do you define a basic command in a devfile?
+        answer: >
+          A basic command in a devfile is defined in the `commands` section using a unique `id` and a type such as `exec`, `apply`, or `composite`. For example, here's a simple `exec` command:
+          ```yaml
+          commands:
+            - id: build
+              exec:
+                component: mysql
+                commandLine: mvn clean
+                workingDir: /projects/spring-petclinic
+          ```
+      - question: What are command groups in a devfile and how are they used?
+        answer: >
+          Command groups categorize commands by their purpose, using kinds like `build`, `run`, `test`, `debug`, or `deploy`. Only one default command is allowed per group kind. Here’s an example:
+          ```yaml
+          commands:
+            - id: package
+              exec:
+                component: maven
+                commandLine: 'mvn package'
+                group:
+                  kind: build
+            - id: install
+              exec:
+                component: maven
+                commandLine: 'mvn install'
+                group:
+                  kind: build
+                  isDefault: true
+          ```
+      - question: How do you define an `exec` command and what are its requirements?
+        answer: >
+          An `exec` command must specify a `commandLine`, a `component` that refers to a container, and optionally a `workingDir`. For example:
+          ```yaml
+          commands:
+            - id: compile-and-run
+              exec:
+                component: go-cli
+                commandLine: 'go get -d && go run main.go'
+                workingDir: '${PROJECTS_ROOT}/src/github.com/acme/my-go-project'
+          ```
+      - question: What is an `apply` command used for in a devfile?
+        answer: >
+          An `apply` command is used to apply a `kubernetes`, `openshift`, or `image` component definition, often for build or deploy operations. Example:
+          ```yaml
+          commands:
+            - id: build-image
+              apply:
+                component: outerloop-build
+            - id: deployk8s
+              apply:
+                component: outerloop-deploy
+          ```
+      - question: How do you create a `composite` command and when is it useful?
+        answer: >
+          A `composite` command groups multiple command IDs to run either sequentially or in parallel. It's useful for combining build or deploy steps. For example:
+          ```yaml
+          commands:
+            - id: install
+              exec:
+                component: maven
+                commandLine: 'mvn install'
+            - id: package
+              exec:
+                component: maven
+                commandLine: 'mvn package'
+            - id: installandpackage
+              composite:
+                commands:
+                  - install
+                  - package
+                parallel: false
+          ```
+      - question: How many types of command kinds are available and what are they?
+        answer: >
+          There are three kinds of commands in a devfile: `exec`, `apply`, and `composite`. Each serves a distinct purpose: executing shell commands, applying resources, or chaining other commands.
+      - question: What does setting `isDefault: true` do for a command?
+        answer: >
+          Setting `isDefault: true` marks the command as the default for its group kind. Only one command can be the default per group. Example:
+          ```yaml
+          - id: install
+            exec:
+              component: maven
+              commandLine: 'mvn install'
+              group:
+                kind: build
+                isDefault: true
+          ```
+      - question: Can you combine `apply` commands in a `composite` command for deployment workflows?
+        answer: >
+          Yes, `apply` commands can be combined in a `composite` command to coordinate deployment workflows. Example:
+          ```yaml
+          commands:
+            - id: build-image
+              apply:
+                component: outerloop-build
+            - id: deployk8s
+              apply:
+                component: outerloop-deploy
+            - id: deploy
+              composite:
+                commands:
+                  - build-image
+                  - deployk8s
+                group:
+                  kind: deploy
+                  isDefault: true
+          ```
+      - question: Can a command be part of more than one group kind?
+        answer: >
+          No, a command in a devfile can only belong to a single group kind. If multiple commands share the same group kind, only one can be marked as the default using `isDefault: true`.
+      - question: What is the purpose of the `workingDir` in an `exec` command?
+        answer: >
+          The `workingDir` specifies the directory within the container where the command should be executed. This is useful to ensure commands run in the correct context. Example:
+          ```yaml
+          - id: run
+            exec:
+              component: go-cli
+              commandLine: go run main.go
+              workingDir: /projects/my-app
+          ```
+      - question: What happens if you set multiple commands as default for the same group?
+        answer: Setting multiple default commands for the same group kind is not allowed and can lead to undefined behavior or devfile validation errors. Only one default command should exist per group.
+      - question: Can `exec` commands be chained without using a composite command?
+        answer: No, individual `exec` commands cannot be chained directly. To run multiple commands in a sequence or in parallel, you must define a `composite` command referencing their IDs.
+  - context: Devfiles in version 2.x support event bindings that enable command execution at specific stages of the container lifecycle. There are three event types: preStart, postStart, and preStop. The preStart event runs commands as Kubernetes init containers before the main containers start. PostStart commands are triggered once the pod is running, and preStop commands execute just before the pod is terminated. These events can reference exec, apply, or composite commands to automate setup, initialization, or cleanup tasks. The syntax allows for flexible orchestration, and example snippets illustrate how to integrate these events into a devfile for streamlined environment management.
+    questions_and_answers:
+      - question: What are the different types of event objects supported in a devfile?
+        answer: >
+          A devfile supports three types of event objects:
+          1. `preStartObject`: Executes commands as Kubernetes init containers in the specified order before the pod starts.
+          2. `postStartObject`: Executes commands immediately after the Kubernetes deployment is created.
+          3. `preStopObject`: Executes commands before the Kubernetes deployment is deleted.
+      - question: How is a `preStart` event defined and what is its behavior?
+        answer: >
+          A `preStart` event is defined in the `events` section of the devfile and includes commands that are run as init containers before the main container starts. These commands can be `exec`, `apply`, or a `composite` type, and their order determines the execution sequence:
+          ```yaml
+          events:
+            preStart:
+              - init-project
+          ```
+      - question: >
+          What happens when a `composite` command with `parallel: true` is used in a `preStart` event?
+        answer: >
+          When a composite command with `parallel: true` is used in a `preStart` event, its sub-commands are executed as Kubernetes init containers running in parallel:
+          ```yaml
+          commands:
+            - id: pre-init
+              composite:
+                commands:
+                  - cmd1
+                  - cmd2
+                parallel: true
+          events:
+            preStart:
+              - pre-init
+          ```
+      - question: What is a `postStart` event and how is it configured in a devfile?
+        answer: >
+          A `postStart` event is executed after the Kubernetes deployment has been created for the devfile component. It is defined in the `events` section and references command IDs that will run once the pod is ready:
+          ```yaml
+          events:
+            postStart:
+              - post-init-cmd
+          ```
+      - question: How do you define environment variables for event commands?
+        answer: >
+          Environment variables for event commands can be specified using the `envObject`, which includes `name` and `value` fields. These can be used within `exec` commands to pass environment-specific configurations:
+          ```yaml
+          commands:
+            - id: configure-env
+              exec:
+                component: tools
+                commandLine: 'echo $GREETING'
+                env:
+                  - name: GREETING
+                    value: Hello
+          ```
+      - question: What is the purpose of the `apply` command in the context of events?
+        answer: >
+          The `apply` command is used to reference Kubernetes or OpenShift components and apply their resources during the event phase. It's useful for setting up required infrastructure or resources before the application runs:
+          ```yaml
+          commands:
+            - id: init-project
+              apply:
+                component: tools
+          events:
+            preStart:
+              - init-project
+          ```
+      - question: Can an event use both `apply` and `exec` commands together?
+        answer: >
+          Yes, an event can reference a mix of `apply`, `exec`, and `composite` commands. The referenced command IDs must be listed in the `events` section in the intended execution order:
+          ```yaml
+          events:
+            preStart:
+              - init-project
+              - configure-env
+          ```
+      - question: How does command execution order work in preStart events?
+        answer: >
+          In `preStart` events, commands are executed sequentially in the order they are listed. This ensures a deterministic setup phase, unless a composite command explicitly enables parallel execution.
+      - question: What kind of command is best suited for `preStop` events?
+        answer: >
+          Commands that perform cleanup tasks, save state, or stop background processes are best suited for `preStop` events. These are defined in the `events` section under `preStop`:
+          ```yaml
+          commands:
+            - id: cleanup
+              exec:
+                component: tools
+                commandLine: 'rm -rf /tmp/data'
+                workingDir: /
+          events:
+            preStop:
+              - cleanup
+          ```
+      - question: Can a single command be reused across multiple event types?
+        answer: Yes, a single command (e.g., `exec`, `apply`, or `composite`) can be referenced in multiple event types like `preStart`, `postStart`, and `preStop`, allowing reuse and consistency in setup and teardown processes.         
+document:
+  repo: https://github.com/tolusha/instructlab_knowledge.git
+  commit: ##REVISION##
+  patterns:
+    - devfile/06-authoring-devfiles-projects-events-commands.md
