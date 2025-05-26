@@ -199,7 +199,7 @@ seed_examples:
       - question: Can you show an example of defining and using a variable in a devfile?
         answer: >
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: java-maven
             version: 1.1.1
@@ -222,7 +222,7 @@ seed_examples:
         answer: >
           Attributes in a component are defined under the `attributes` key inside the component. These can configure resource specifications like CPU, memory, and port settings. Here's an example:
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: java-quarkus
           components:
@@ -241,7 +241,7 @@ seed_examples:
         answer: >
           A custom attribute at the devfile level is defined under the `attributes` section at the top of the devfile. This allows global custom configuration. Example:
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           attributes:
             editorFree: true
           metadata:

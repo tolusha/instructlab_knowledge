@@ -210,7 +210,7 @@ Procedure
 1.  Add a variable definition at the top level in your devfile:
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: java-maven
           version: 1.1.1
@@ -253,7 +253,7 @@ Procedure
 1.  Define attributes in a component:
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: java-quarkus
         ...
@@ -275,7 +275,7 @@ Procedure
     When no editor is specified, a default editor is provided. To represent this user-defined example, use the `editorFree` attribute as shown in the following example:
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         attributes:
             editorFree: true
         metadata:

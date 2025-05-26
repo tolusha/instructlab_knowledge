@@ -348,7 +348,7 @@ JetBrains Space Cloud Dev uses the 2.2.0 devfile specification and supports the 
 #### Example of JetBrains Space Cloud Dev devfile setup
 
 ```yaml
-    schemaVersion: 2.2.0
+    schemaVersion: 2.3.0
     metadata:
       name: 'My custom dev env configuration'
     attributes:
@@ -406,7 +406,7 @@ JetBrains Space Cloud Dev also partially supports [outerloop](/docs/2.3.0/innerl
 #### Example of JetBrains Space Cloud Dev image build devfile setup
 
 ```yaml
-    schemaVersion: 2.2.0
+    schemaVersion: 2.3.0
     attributes:
       space:
         instanceType: large
@@ -456,7 +456,7 @@ Using the `id` when published in a registry. Provide the `registryUrl` as well a
 #### Parent referred by registry
 
 ```yaml
-    schemaVersion: 2.2.0
+    schemaVersion: 2.3.0
     metadata:
       name: my-project-dev
     parent:
@@ -472,7 +472,7 @@ Using the URI when published on a static HTTP server, such as GitHub Gist or Pas
 #### Parent referred by URI
 
 ```yaml
-    schemaVersion: 2.2.0
+    schemaVersion: 2.3.0
     metadata:
       name: my-project-dev
     parent:
@@ -486,7 +486,7 @@ Using a Kubernetes resource name and namespace if it has been deployed on a Kube
 #### Parent identified by a Kubernetes resource
 
 ```yaml
-    schemaVersion: 2.2.0
+    schemaVersion: 2.3.0
     metadata:
       name: my-project-dev
     parent:

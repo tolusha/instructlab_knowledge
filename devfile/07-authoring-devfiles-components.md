@@ -95,7 +95,7 @@ Procedure
     #### A minimal container component
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: mydevfile
         components:
@@ -115,7 +115,7 @@ Procedure
     For the `container` component to have access to the project sources, you must set the `mountSources` attribute to `true`.
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: mydevfile
         components:
@@ -233,7 +233,7 @@ Procedure
     #### Minimal volume example
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: mydevfile
         components:
@@ -256,7 +256,7 @@ Procedure
     #### Ephemeral volume example
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: mydevfile
         components:
@@ -319,7 +319,7 @@ Procedure
     #### Specifying environment variables for a container component
     
       ```yaml    
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: mydevfile
         components:
@@ -347,7 +347,7 @@ Procedure
 #### Specifying endpoint properties
 
 ```yaml
-    schemaVersion: 2.2.0
+    schemaVersion: 2.3.0
     metadata:
       name: mydevfile
     projects:
@@ -408,7 +408,7 @@ Specifying endpoints for `kubernetes` or `openshift` types
 ----------------------------------------------------------
 
 ```yaml
-    schemaVersion: 2.2.0
+    schemaVersion: 2.3.0
     metadata:
       name: mydevfile
     components:
@@ -447,7 +447,7 @@ Procedure
 The following component references a file that is relative to the location of the devfile:
 
 ```yaml
-    schemaVersion: 2.2.0
+    schemaVersion: 2.3.0
     metadata:
       name: mydevfile
     projects:

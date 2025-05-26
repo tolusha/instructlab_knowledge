@@ -75,7 +75,7 @@ seed_examples:
       - question: What is the a sample devfile for .NET 5.0
         answer: |
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: dotnet50
             displayName: .NET 5.0
@@ -136,7 +136,7 @@ seed_examples:
       - question: What is the a sample devfile for .NET 6.0
         answer: |
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: dotnet60
             displayName: .NET 6.0
@@ -319,7 +319,7 @@ seed_examples:
       - question: What is the a sample devfile for Go Runtime
         answer: |
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: go
             displayName: Go Runtime
@@ -679,7 +679,7 @@ seed_examples:
       - question: What is the a sample devfile for Quarkus Java
         answer: |
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: java-quarkus
             displayName: Quarkus Java
@@ -1400,7 +1400,7 @@ seed_examples:
       - question: What is the a sample devfile for WildFly Getting Started
         answer: |
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: wildfly-start
             version: 2.0.2
@@ -1865,7 +1865,7 @@ seed_examples:
       - question: What is the a sample devfile for React
         answer: |
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: nodejs-react
             displayName: React
@@ -1917,7 +1917,7 @@ seed_examples:
       - question: What is the a sample devfile for Svelte
         answer: |
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: nodejs-svelte
             displayName: Svelte
@@ -1969,7 +1969,7 @@ seed_examples:
       - question: What is the a sample devfile for Vue
         answer: |
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: nodejs-vue
             displayName: Vue
@@ -2405,7 +2405,7 @@ seed_examples:
       - question: What is the a sample devfile for Universal Developer Image
         answer: |
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: udi
             displayName: Universal Developer Image

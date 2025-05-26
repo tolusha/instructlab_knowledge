@@ -215,7 +215,7 @@ seed_examples:
         answer: >
           You can refer to a parent devfile published in a Devfile registry using its `id`, along with the `registryUrl` and optional `version`. If `version` is not specified, the default version is used:
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: my-project-dev
           parent:
@@ -227,7 +227,7 @@ seed_examples:
         answer: >
           You can refer to a parent devfile hosted on a static HTTP server by providing the `uri`. This is useful for referencing devfiles stored on GitHub or similar:
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: my-project-dev
           parent:
@@ -237,7 +237,7 @@ seed_examples:
         answer: >
           You can refer to a parent devfile that is a Kubernetes Custom Resource of type `DevWorkspaceTemplate` by specifying its `name` and `namespace`:
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: my-project-dev
           parent:

@@ -144,7 +144,7 @@ Devfile samples
 
 Sample devfile for .NET 5.0
 ```yaml
-schemaVersion: 2.2.0
+schemaVersion: 2.3.0
 metadata:
   name: dotnet50
   displayName: .NET 5.0
@@ -204,7 +204,7 @@ commands:
 ```
 Sample devfile for .NET 6.0
 ```yaml
-schemaVersion: 2.2.0
+schemaVersion: 2.3.0
 metadata:
   name: dotnet60
   displayName: .NET 6.0
@@ -384,7 +384,7 @@ commands:
 ```
 Sample devfile for Go Runtime
 ```yaml
-schemaVersion: 2.2.0
+schemaVersion: 2.3.0
 metadata:
   name: go
   displayName: Go Runtime
@@ -742,7 +742,7 @@ commands:
 ```
 Sample devfile for Quarkus Java
 ```yaml
-schemaVersion: 2.2.0
+schemaVersion: 2.3.0
 metadata:
   name: java-quarkus
   displayName: Quarkus Java
@@ -1459,7 +1459,7 @@ commands:
 ```
 Sample devfile for WildFly Getting Started
 ```yaml
-schemaVersion: 2.2.0
+schemaVersion: 2.3.0
 metadata:
   name: wildfly-start
   version: 2.0.2
@@ -1921,7 +1921,7 @@ commands:
 ```
 Sample devfile for React
 ```yaml
-schemaVersion: 2.2.0
+schemaVersion: 2.3.0
 metadata:
   name: nodejs-react
   displayName: React
@@ -1972,7 +1972,7 @@ commands:
 ```
 Sample devfile for Svelte
 ```yaml
-schemaVersion: 2.2.0
+schemaVersion: 2.3.0
 metadata:
   name: nodejs-svelte
   displayName: Svelte
@@ -2023,7 +2023,7 @@ commands:
 ```
 Sample devfile for Vue
 ```yaml
-schemaVersion: 2.2.0
+schemaVersion: 2.3.0
 metadata:
   name: nodejs-vue
   displayName: Vue
@@ -2453,7 +2453,7 @@ commands:
 ```
 Sample devfile for Universal Developer Image
 ```yaml
-schemaVersion: 2.2.0
+schemaVersion: 2.3.0
 metadata:
   name: udi
   displayName: Universal Developer Image

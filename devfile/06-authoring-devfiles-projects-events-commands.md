@@ -32,7 +32,7 @@ Procedure
 1.  Add a `projects` section in the devfile, containing a list of one or more projects.
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: petclinic-dev-environment
           version: 1.0.0
@@ -48,7 +48,7 @@ Procedure
     #### A devfile with multiple projects
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: example-devfile
           version: 1.0.0
@@ -96,7 +96,7 @@ Procedure
     #### Defining the clonePath attribute
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: my-project-dev
           version: 2.0.0
@@ -124,7 +124,7 @@ Each starter project requires a `name`, and a definition for either a `git` or `
 #### A devfile with git and zip starter projects
 
   ```yaml
-    schemaVersion: 2.2.0
+    schemaVersion: 2.3.0
     starterProjects:
     - name: nodejs-starter
       git:
@@ -139,7 +139,7 @@ Each starter project requires a `name`, and a definition for either a `git` or `
 #### A devfile with multiple git starter projects
 
   ```yaml
-    schemaVersion: 2.2.0
+    schemaVersion: 2.3.0
     metadata:
       name: example-devfile
       version: 1.0.0
@@ -160,7 +160,7 @@ With the optional `subDir` field, you can specify a subdirectory in the project 
 
 #### A starter project specifying revision and subDir
   ```yaml
-    schemaVersion: 2.2.0
+    schemaVersion: 2.3.0
     starterProjects:
     - name: demo-starter
       git:
@@ -215,7 +215,7 @@ Procedure
 3.  At most, there can only be one default command for each group kind. Set the default command by specifying `isDefault` to `true`.
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: mydevfile
         projects:
@@ -249,7 +249,7 @@ Procedure
 4.  Use the `deploy` kind to reference a deploy command for an outerloop scenario.
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: python
           version: 1.0.0
@@ -301,7 +301,7 @@ Use the the `exec` command to automate the container actions.
         
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: mydevfile
         projects:
@@ -342,7 +342,7 @@ Use the the `apply` command to apply a given component definition, usually a `ku
 1.  Define the `apply` command to apply a given component. In the following example, two apply commands reference an `image` component and a `kubernetes` component to build a docker image and to apply the deployment YAML for an outerloop scenario.
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: python
           version: 1.0.0
@@ -394,7 +394,7 @@ Procedure
 2.  Specify whether to run the commands within a composite command in sequence or parallel by defining the `parallel` property
     
       ```yaml
-        schemaVersion: 2.2.0
+        schemaVersion: 2.3.0
         metadata:
           name: mydevfile
         projects:

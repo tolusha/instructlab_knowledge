@@ -172,8 +172,6 @@ seed_examples:
                     secure: 'true'
                     exposure: public
           ```
-
-seed_examples:
   - context: Devfiles support defining an image component to build container images as part of the development or deployment workflow. An image component is configured using a Dockerfile-based build and can source its content from a local URI, a Git repository, or a Devfile Registry entry. Key properties include imageName to specify the target image name, buildContext to set the directory for the Docker build context, args to pass build-time variables, and rootRequired to indicate whether elevated permissions are needed during the build. Multiple YAML examples illustrate how to configure each source type, enabling flexible image-building strategies directly within the devfile.
     questions_and_answers:
       - question: How can I define an image component in a devfile using a Dockerfile from the local project?
@@ -247,7 +245,7 @@ seed_examples:
         answer: >
           You define a volume by adding a component of type `volume` and specifying its size. Then you mount it in a container by referencing the volume name in `volumeMounts`:
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: mydevfile
           components:
@@ -268,7 +266,7 @@ seed_examples:
         answer: >
           To make a volume ephemeral, set the `ephemeral: true` field in the `volume` definition. This ensures that the volume's data does not persist between container restarts:
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: mydevfile
           components:
@@ -313,7 +311,7 @@ seed_examples:
         answer: >
           You can set environment variables using the `env` property within the `container` component:
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: mydevfile
           components:
@@ -441,7 +439,7 @@ seed_examples:
         answer: >
           Below is a complete example of a devfile that references a Kubernetes YAML list containing PostgreSQL Deployment, Service, and PersistentVolumeClaim:
           ```yaml
-          schemaVersion: 2.2.0
+          schemaVersion: 2.3.0
           metadata:
             name: mydevfile
           projects:
