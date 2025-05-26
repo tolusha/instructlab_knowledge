@@ -107,7 +107,7 @@ seed_examples:
           ```
       - question: Is it possible to have multiple git starter projects in a devfile?
         answer: >
-          Yes, you can define multiple git starter projects. Each project must have a unique `name` and a single `origin` remote:  
+          Yes, you can define multiple git starter projects. Each project must have a unique `name` and a single `origin` remote:
           ```yaml
           schemaVersion: 2.2.0
           metadata:
@@ -124,7 +124,7 @@ seed_examples:
                   origin: 'https://github.com/acmecorp/backend.git'
           ```
       - question: How do you specify a branch, tag, or commit for a git-based starter project?
-        answer: > 
+        answer: >
           You can use the `checkoutFrom.revision` field under the git object to specify a branch, tag, or commit:
           ```yaml
           schemaVersion: 2.2.0
@@ -371,7 +371,7 @@ seed_examples:
               - cleanup
           ```
       - question: Can a single command be reused across multiple event types?
-        answer: Yes, a single command (e.g., `exec`, `apply`, or `composite`) can be referenced in multiple event types like `preStart`, `postStart`, and `preStop`, allowing reuse and consistency in setup and teardown processes.         
+        answer: Yes, a single command (e.g., `exec`, `apply`, or `composite`) can be referenced in multiple event types like `preStart`, `postStart`, and `preStop`, allowing reuse and consistency in setup and teardown processes.
 document:
   repo: https://github.com/tolusha/instructlab_knowledge.git
   commit: ##REVISION##

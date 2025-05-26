@@ -118,7 +118,7 @@ seed_examples:
           ```
       - question: What are the differences between `apply` and `composite` commands?
         answer: >
-          `apply` commands are used to trigger a single component operation, such as building an image or applying a deployment. `composite` commands combine multiple other commands to run them sequentially or in parallel. 
+          `apply` commands are used to trigger a single component operation, such as building an image or applying a deployment. `composite` commands combine multiple other commands to run them sequentially or in parallel.
           Example of an `apply` command:
           ```yaml
           - id: build-image
@@ -282,7 +282,7 @@ seed_examples:
               securityContext: {"runAsUser": 1001, "runAsGroup": 1001}
             pod-overrides:
               spec: {"serviceAccountName": "new-service-account"}
-          ```         
+          ```
 document:
   repo: https://github.com/tolusha/instructlab_knowledge.git
   commit: ##REVISION##

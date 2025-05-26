@@ -57,7 +57,7 @@ seed_examples:
           ```
       - question: What metadata fields are recommended when creating a web service devfile template?
         answer: >
-          Recommended metadata fields include `name`, `version`, `description`, `projectType`, `language`, 
+          Recommended metadata fields include `name`, `version`, `description`, `projectType`, `language`,
           `provider`, `tags`, `architectures`, `displayName`, and `icon`.
           ```yaml
           schemaVersion: 2.3.0
@@ -93,7 +93,7 @@ seed_examples:
           ```
       - question: How do you define commands to build and run the project in the devfile?
         answer: >
-          Commands should have an `id`, and use the `exec` type with a `commandLine`, `component`, and `workingDir`. 
+          Commands should have an `id`, and use the `exec` type with a `commandLine`, `component`, and `workingDir`.
           Grouping commands with `build` or `run` kinds is recommended.
           ```yaml
           commands:
@@ -283,7 +283,7 @@ seed_examples:
         answer: >
           Four questions are sufficient to fully cover the content of the document: one for how to create a devfile, one for outerloop resources, one for locating supporting files, and one summarizing the number of questions required.
       - question: What is the correct file name and location for the devfile?
-        answer: The devfile should be saved with the name `.devfile.yaml` and placed in the root directory of your application. This ensures proper detection and usage by tools that rely on the devfile format.         
+        answer: The devfile should be saved with the name `.devfile.yaml` and placed in the root directory of your application. This ensures proper detection and usage by tools that rely on the devfile format.
 document:
   repo: https://github.com/tolusha/instructlab_knowledge.git
   commit: ##REVISION##
