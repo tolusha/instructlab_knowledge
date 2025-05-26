@@ -1600,4 +1600,4 @@ document:
   repo: https://github.com/tolusha/instructlab_knowledge.git
   commit: ##REVISION##
   patterns:
-    - devfile/04-devfile-schema.json
+    - devfile/04-devfile-schema.md
